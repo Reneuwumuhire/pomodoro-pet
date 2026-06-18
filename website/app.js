@@ -194,6 +194,25 @@ function detectOS() {
   })
 })()
 
+// --- live download count (GitHub Releases API) -----------------------------
+;(function loadDownloadCount() {
+  const el = document.getElementById('dl-count')
+  if (!el) return
+  fetch('https://api.github.com/repos/Reneuwumuhire/pomodoro-pet/releases')
+    .then((r) => (r.ok ? r.json() : []))
+    .then((rels) => {
+      const total = (rels || []).reduce(
+        (sum, rel) => sum + (rel.assets || []).reduce((s, a) => s + (a.download_count || 0), 0),
+        0
+      )
+      if (total > 0) {
+        el.textContent = `⬇ ${total.toLocaleString()} download${total === 1 ? '' : 's'} so far`
+        el.hidden = false
+      }
+    })
+    .catch(() => {})
+})()
+
 // --- boot ------------------------------------------------------------------
 renderDots()
 setToggle()

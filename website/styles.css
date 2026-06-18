@@ -346,3 +346,11 @@ a { color: inherit; text-decoration: none; }
 }
 .dl-pill.on { background: #fff; color: var(--ink); border-color: #fff; }
 .dl-pill:hover { transform: translateY(-2px); }
+
+/* ============================================================= DOWNLOADS / FOOTER EXTRAS */
+.dl-count { margin-top: 16px; font-weight: 700; font-size: 14px; color: rgba(255, 255, 255, 0.9); }
+.dl-source { margin-top: 12px; font-size: 13px; }
+.dl-source a { color: #fff; opacity: 0.85; border-bottom: 1px solid rgba(255, 255, 255, 0.4); padding-bottom: 1px; }
+.dl-source a:hover { opacity: 1; }
+.foot-mid a { color: var(--bone); border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
+.foot-mid a:hover { color: #fff; }

@@ -1,10 +1,14 @@
 # Pomodoro Pet 🥚🐾
 
+[![Latest release](https://img.shields.io/github/v/release/Reneuwumuhire/pomodoro-pet?color=e8463a)](https://github.com/Reneuwumuhire/pomodoro-pet/releases)
+[![Downloads](https://img.shields.io/github/downloads/Reneuwumuhire/pomodoro-pet/total?color=2ea44f&label=downloads)](https://github.com/Reneuwumuhire/pomodoro-pet/releases)
+[![Stars](https://img.shields.io/github/stars/Reneuwumuhire/pomodoro-pet?style=flat)](https://github.com/Reneuwumuhire/pomodoro-pet/stargazers)
+
 A retro **LCD-gadget Pomodoro timer** for **macOS and Windows**, built with Electron + React. A
 pixel pet wakes up and grows as you complete focus sessions. Lives in the menu bar / system tray,
 with an optional always-on-top mini widget and a strict-mode fullscreen break.
 
-🌐 **Website:** https://reneuwumuhire.github.io/pomodoro-pet/
+🌐 **Website:** https://reneuwumuhire.github.io/pomodoro-pet/ · **Created by [Rene Uwumuhire](https://github.com/Reneuwumuhire)**
 
 > Platform note: the timer, pet, six skins, audio, tasks, stats, mini widget and strict-mode
 > break run on both macOS and Windows. The **Focus Shield** (active-tab site blocking) is
