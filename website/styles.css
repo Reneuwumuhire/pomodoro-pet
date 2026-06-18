@@ -389,3 +389,6 @@ a { color: inherit; text-decoration: none; }
   .evo-arrow { font-size: 18px; }
   .grow-pets canvas { width: 46px; height: 46px; }
 }
+
+.ph-badge { margin-top: 22px; display: flex; justify-content: center; }
+.ph-badge img { width: 250px; height: 54px; }
