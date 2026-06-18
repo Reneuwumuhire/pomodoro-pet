@@ -197,7 +197,7 @@ applyDownloads() // initial: links fall back to the Releases page
 
 // Fetch the latest release: rewire the buttons to direct asset downloads (so a
 // click downloads the file instead of opening GitHub) and show the count.
-fetch('https://api.github.com/repos/Reneuwumuhire/petomato/releases')
+fetch('https://api.github.com/repos/Reneuwumuhire/petomato/releases', { cache: 'no-store' })
   .then((r) => (r.ok ? r.json() : []))
   .then((rels) => {
     rels = rels || []

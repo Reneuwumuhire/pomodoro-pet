@@ -91,7 +91,7 @@ export function createMainWindow(): BrowserWindow {
     movable: true,
     frame: false,
     transparent: true,
-    hasShadow: true,
+    hasShadow: false,
     fullscreenable: false,
     skipTaskbar: true,
     alwaysOnTop: true,
