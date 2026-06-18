@@ -256,7 +256,8 @@ a { color: inherit; text-decoration: none; }
 .d-dark { background: linear-gradient(180deg, var(--dev-dark-top), var(--dev-dark-bot)); box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 3px 0 rgba(0,0,0,.5); }
 .d-btn:active { transform: translateY(2px); }
 .d-speaker { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
-.d-chip { width: 34px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: linear-gradient(180deg, #3a3a3a, #2a2a2a); font-size: 13px; }
+.d-chip { width: 34px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: linear-gradient(180deg, #3a3a3a, #2a2a2a); color: rgba(255, 255, 255, 0.85); }
+.d-chip svg { width: 15px; height: 15px; }
 .d-grille { flex: 1; height: 26px; border-radius: 8px; background: var(--dev-grille); }
 
 .skin-switch { display: flex; gap: 8px; }

@@ -3,13 +3,63 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Petomato — focus you can watch grow</title>
+    <title>Petomato — a Pomodoro timer with a pixel pet that grows as you focus</title>
     <meta
       name="description"
-      content="A retro-LCD Pomodoro timer for macOS with a pixel pet that grows while you focus. Six skins, lo-fi audio, strict-mode site blocking, tasks and stats."
+      content="Petomato is a free retro-LCD Pomodoro timer for macOS &amp; Windows with a pixel pet that grows as you focus. Six skins, lo-fi &amp; ambient sounds, tasks, stats, strict-mode site blocking, and a mini widget."
     />
+    <meta
+      name="keywords"
+      content="Pomodoro timer, focus timer, pixel pet, productivity app, macOS, Windows, lo-fi, ambient sounds, menu bar timer, study timer, Petomato"
+    />
+    <meta name="author" content="Rene Uwumuhire" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#e8463a" />
+    <link rel="canonical" href="https://reneuwumuhire.github.io/petomato/" />
     <link rel="icon" href="assets/img/icon.png" />
-    <link rel="stylesheet" href="styles.css?v=6" />
+    <link rel="apple-touch-icon" href="assets/img/icon.png" />
+
+    <!-- Open Graph (Facebook, LinkedIn, iMessage, Slack…) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Petomato" />
+    <meta property="og:title" content="Petomato — focus you can watch grow" />
+    <meta
+      property="og:description"
+      content="A free retro-LCD Pomodoro timer for macOS &amp; Windows with a pixel pet that grows as you focus. Six skins, lo-fi &amp; ambient, tasks &amp; stats."
+    />
+    <meta property="og:url" content="https://reneuwumuhire.github.io/petomato/" />
+    <meta property="og:image" content="https://reneuwumuhire.github.io/petomato/assets/img/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Petomato — a retro-LCD Pomodoro timer with a pixel pet" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Petomato — focus you can watch grow" />
+    <meta
+      name="twitter:description"
+      content="A free retro-LCD Pomodoro timer for macOS &amp; Windows with a pixel pet that grows as you focus."
+    />
+    <meta name="twitter:image" content="https://reneuwumuhire.github.io/petomato/assets/img/og.png" />
+
+    <!-- Structured data: rich results for the app -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Petomato",
+        "applicationCategory": "ProductivityApplication",
+        "operatingSystem": "macOS, Windows",
+        "description": "A free retro-LCD Pomodoro timer with a pixel pet that grows as you focus.",
+        "url": "https://reneuwumuhire.github.io/petomato/",
+        "image": "https://reneuwumuhire.github.io/petomato/assets/img/og.png",
+        "downloadUrl": "https://github.com/Reneuwumuhire/petomato/releases",
+        "author": { "@type": "Person", "name": "Rene Uwumuhire", "url": "https://github.com/Reneuwumuhire" },
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      }
+    </script>
+
+    <link rel="stylesheet" href="styles.css?v=7" />
   </head>
   <body data-theme="lcd">
     <!-- NAV -->
@@ -85,8 +135,10 @@
                 </button>
               </div>
               <div class="d-speaker">
-                <span class="d-chip">🔊</span>
+                <span class="d-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></span>
                 <canvas class="d-grille" id="d-grille"></canvas>
+                <span class="d-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 19 22 12 13 5 13 19"/><polygon points="2 19 11 12 2 5 2 19"/></svg></span>
+                <span class="d-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" x2="19" y1="5" y2="19"/></svg></span>
               </div>
               <div class="d-task">＋ Pick a task to focus on</div>
             </div>
@@ -226,7 +278,7 @@
       <span>Made for people who get distracted. 🐾</span>
     </footer>
 
-    <script src="assets/pet.js?v=6"></script>
-    <script src="app.js?v=6"></script>
+    <script src="assets/pet.js?v=7"></script>
+    <script src="app.js?v=7"></script>
   </body>
 </html>
