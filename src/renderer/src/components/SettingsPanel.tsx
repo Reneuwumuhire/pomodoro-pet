@@ -43,14 +43,16 @@ function Toggle({
 
 const MUSIC_OPTS: { v: MusicTrack; label: string }[] = [
   { v: 'none', label: 'Off' },
-  { v: 'focus_music', label: 'Lo-fi pad' },
-  { v: 'break_music', label: 'Bright pad' }
+  { v: 'lofi1', label: 'Chill' },
+  { v: 'lofi2', label: 'Autumn' },
+  { v: 'lofi3', label: 'Dreams' },
+  { v: 'lofi4', label: 'Mellow' }
 ]
 const AMBIENT_OPTS: { v: AmbientTrack; label: string }[] = [
   { v: 'none', label: 'Off' },
   { v: 'rain', label: 'Rain' },
   { v: 'brown', label: 'Ocean' },
-  { v: 'whitenoise', label: 'White' },
+  { v: 'whitenoise', label: 'Brown' },
   { v: 'cafe', label: 'Café' }
 ]
 

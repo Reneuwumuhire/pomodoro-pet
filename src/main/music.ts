@@ -6,10 +6,8 @@ import { getSettings } from './store'
 
 export const SCHEME = 'pomo-audio'
 
-/** Slot key (used by the renderer) -> filename the user drops into the folder. */
+/** Ambient slot key (used by the renderer) -> filename the user drops in to override it. */
 export const SLOT_FILES: Record<string, string> = {
-  focus_music: 'focus.mp3',
-  break_music: 'break.mp3',
   rain: 'rain.mp3',
   brown: 'ocean.mp3',
   whitenoise: 'white.mp3',

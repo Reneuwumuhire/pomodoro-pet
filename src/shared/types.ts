@@ -5,7 +5,7 @@ export type Status = 'idle' | 'running' | 'paused'
 
 export type PetKind = 'cat' | 'dog' | 'panda' | 'bunny' | 'wolf' | 'bear'
 
-export type MusicTrack = 'none' | 'focus_music' | 'break_music'
+export type MusicTrack = 'none' | 'lofi1' | 'lofi2' | 'lofi3' | 'lofi4'
 export type AmbientTrack = 'none' | 'rain' | 'whitenoise' | 'brown' | 'cafe'
 
 export type Tag = 'Coding' | 'Writing' | 'Admin' | 'Study' | 'Design' | 'Other'
@@ -103,8 +103,8 @@ export const DEFAULT_SETTINGS: Settings = {
   autoStartWork: false,
   strictMode: false,
   muteNotificationsDuringFocus: false,
-  focusMusic: 'focus_music',
-  breakMusic: 'break_music',
+  focusMusic: 'lofi1',
+  breakMusic: 'lofi3',
   musicVolume: 0.5,
   ambient: 'none',
   ambientVolume: 0.5,

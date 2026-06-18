@@ -217,13 +217,20 @@ fetch('https://api.github.com/repos/Reneuwumuhire/petomato/releases')
       (sum, r) => sum + (r.assets || []).reduce((s, a) => s + (a.download_count || 0), 0),
       0
     )
+    // prominent live counter in the stats strip (always shown)
+    const stat = document.getElementById('stat-downloads')
+    if (stat) stat.textContent = total.toLocaleString()
+    // contextual note by the download button (only once there are any)
     const el = document.getElementById('dl-count')
     if (el && total > 0) {
       el.textContent = `⬇ ${total.toLocaleString()} download${total === 1 ? '' : 's'} so far`
       el.hidden = false
     }
   })
-  .catch(() => {})
+  .catch(() => {
+    const stat = document.getElementById('stat-downloads')
+    if (stat) stat.textContent = '0'
+  })
 
 // --- boot ------------------------------------------------------------------
 renderDots()

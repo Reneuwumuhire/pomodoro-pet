@@ -3,16 +3,20 @@ import { usePomodoro } from '@/state/usePomodoro'
 import { connectElement, resume, setPlaying } from './audioBus'
 import { prettyTrack, setMusicHandlers } from './musicControls'
 
-import focusUrl from '../assets/audio/focus_music.mp3'
-import breakUrl from '../assets/audio/break_music.mp3'
+import lofi1Url from '../assets/audio/lofi1.mp3'
+import lofi2Url from '../assets/audio/lofi2.mp3'
+import lofi3Url from '../assets/audio/lofi3.mp3'
+import lofi4Url from '../assets/audio/lofi4.mp3'
 import rainUrl from '../assets/audio/rain.mp3'
 import whiteUrl from '../assets/audio/whitenoise.mp3'
 import brownUrl from '../assets/audio/brown.mp3'
 import cafeUrl from '../assets/audio/cafe.mp3'
 
 const BUNDLED: Record<string, string> = {
-  focus_music: focusUrl,
-  break_music: breakUrl,
+  lofi1: lofi1Url,
+  lofi2: lofi2Url,
+  lofi3: lofi3Url,
+  lofi4: lofi4Url,
   rain: rainUrl,
   whitenoise: whiteUrl,
   brown: brownUrl,

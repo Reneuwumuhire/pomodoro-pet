@@ -34,9 +34,9 @@ first launch needs right-click → **Open** on macOS / **More info → Run anywa
 - **Analytics dashboard**: weekly/monthly focus-minute bar chart, by-tag pie chart, streak + milestones.
 
 ### Focus environment
-- **Audio engine** — phase-aware music (focus / break) plus an ambient mixer (rain, ocean, white
-  noise, café) with independent volumes. Ships with **synthesized, royalty-free** loops (generated
-  with ffmpeg — safe, no licensing).
+- **Audio engine** — phase-aware music (focus / break) plus an ambient mixer with independent
+  volumes. Ships with **four real CC0 lo-fi tracks** to choose from and **real CC0 field
+  recordings** for Rain, Ocean, Café and White noise (5-minute loops). All public-domain (CC0).
 - **Bring your own music** — in Settings → **Music folder**, **choose any folder** (native picker)
   or **drag a folder** onto the panel from anywhere on disk; dropping a song picks its containing
   folder. Its songs (`.mp3/.m4a/.wav/.ogg/.flac`, e.g. from
@@ -129,7 +129,8 @@ to wire up the download link and deploy.
 
 ```bash
 node scripts/gen-assets.mjs   # app icon + anti-aliased menu-bar clock
-# audio loops are generated with ffmpeg (synthesized, royalty-free)
+# bundled audio is real CC0 lo-fi + field recordings (see Credits), processed
+# with ffmpeg into 5-minute loopable mp3s in src/renderer/src/assets/audio/
 ```
 
 ## Credits
@@ -138,3 +139,7 @@ node scripts/gen-assets.mjs   # app icon + anti-aliased menu-bar clock
 - **Design inspiration:** [Pomodoro — Web Design](https://dribbble.com/shots/27126923-Pomodoro-Web-Design)
   by **Arip for kiwari** on Dribbble.
 - Icons by [Lucide](https://lucide.dev) (via `react-icons`); fonts: Bricolage Grotesque + Press Start 2P.
+- **Audio** (all CC0 / public domain): lo-fi tracks from [OpenGameArt](https://opengameart.org)
+  (incl. HoliznaCC0); ambient field recordings (rain/ocean/café/white) from
+  [OpenGameArt](https://opengameart.org) and [Freesound](https://freesound.org). No attribution
+  required, but credited with thanks.
