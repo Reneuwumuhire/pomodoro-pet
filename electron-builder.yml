@@ -1,0 +1,49 @@
+appId: com.rene.pomodoropet
+productName: Pomodoro Pet
+directories:
+  buildResources: resources
+  output: dist
+files:
+  - out/**/*
+  - package.json
+extraResources:
+  - from: resources
+    to: resources
+    filter:
+      - chime.mp3
+      - trayTemplate.png
+      - trayTemplate@2x.png
+      - trayWin.png
+mac:
+  category: public.app-category.productivity
+  hardenedRuntime: true
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+  extendInfo:
+    NSAppleEventsUsageDescription: >-
+      Pomodoro Pet checks the active app and browser tab to block distractions
+      during strict-mode focus sessions.
+  target:
+    - target: dmg
+      arch:
+        - arm64
+  # To also ship Intel, add `- x64` (requires downloading an x64 Electron),
+  # or use `- universal` for a single fat binary.
+  icon: resources/icon.icns
+  # Unsigned build. To sign/notarize later, set CSC_LINK + CSC_KEY_PASSWORD
+  # and add notarize config / Apple credentials.
+dmg:
+  title: Pomodoro Pet
+win:
+  # Build with `pnpm dist:win` (best run on Windows, or on macOS with wine).
+  icon: resources/icon.ico
+  target:
+    - target: nsis
+      arch:
+        - x64
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  shortcutName: Pomodoro Pet

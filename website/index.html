@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pomodoro Pet — focus you can watch grow</title>
+    <meta
+      name="description"
+      content="A retro-LCD Pomodoro timer for macOS with a pixel pet that grows while you focus. Six skins, lo-fi audio, strict-mode site blocking, tasks and stats."
+    />
+    <link rel="icon" href="assets/img/icon.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-theme="lcd">
+    <!-- NAV -->
+    <header class="nav">
+      <a class="brand" href="#top">
+        <img src="assets/img/icon.png" alt="" width="28" height="28" />
+        <span>Pomodoro&nbsp;Pet</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#skins">Skins</a>
+        <a href="#grow">Your pet</a>
+        <a href="#features">Features</a>
+        <a class="nav-cta" href="#download">Get it</a>
+      </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero" id="top">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">MAC &amp; WINDOWS · POMODORO · A LITTLE FRIEND</p>
+          <h1 class="display">
+            Focus you can <span class="hl">watch&nbsp;grow.</span>
+          </h1>
+          <p class="lede">
+            A pocket-sized timer that lives in your menu bar. Start a session and a
+            pixel pet wakes up beside the clock — finish your sessions and it grows up.
+          </p>
+          <div class="hero-actions">
+            <a class="btn-primary" id="dl-primary" href="#download">Download</a>
+            <span class="btn-note" id="dl-note-top">Free · macOS &amp; Windows</span>
+          </div>
+          <p class="dl-alt"><a href="#download" id="dl-alt">Also available for another platform</a></p>
+          <div class="hero-tags">
+            <span>Lo-fi &amp; ambient</span><span>Strict-mode blocking</span>
+            <span>Tasks &amp; stats</span><span>6 skins</span>
+          </div>
+        </div>
+
+        <!-- LIVE INTERACTIVE DEVICE -->
+        <div class="hero-device">
+          <div class="device" id="device">
+            <div class="lcd">
+              <div class="lcd-inner">
+                <div class="lcd-head" id="d-phase">SESSION 1</div>
+                <div class="lcd-time" id="d-time">25:00</div>
+                <canvas class="lcd-pet" id="d-pet" width="120" height="120"></canvas>
+                <div class="lcd-dots" id="d-dots"></div>
+              </div>
+              <div class="lcd-scan"></div>
+              <div class="lcd-glare"></div>
+            </div>
+            <div class="d-controls">
+              <button class="d-btn d-red" id="d-toggle">
+                <span class="d-label">START</span><span class="d-ico">▶</span>
+              </button>
+              <button class="d-btn d-dark" id="d-reset">
+                <span class="d-label">RESET</span><span class="d-ico">↺</span>
+              </button>
+            </div>
+            <div class="d-speaker">
+              <span class="d-chip">🔊</span>
+              <canvas class="d-grille" id="d-grille"></canvas>
+            </div>
+          </div>
+          <div class="skin-switch" id="skin-switch" aria-label="Try a skin"></div>
+          <p class="skin-hint">Tap a skin — it’s live ↑</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- MARQUEE -->
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span>FOCUS</span><b>•</b><span>GROW YOUR PET</span><b>•</b><span>LO-FI</span><b>•</b>
+        <span>STRICT MODE</span><b>•</b><span>TINY WIDGET</span><b>•</b><span>STREAKS</span><b>•</b>
+        <span>FOCUS</span><b>•</b><span>GROW YOUR PET</span><b>•</b><span>LO-FI</span><b>•</b>
+        <span>STRICT MODE</span><b>•</b><span>TINY WIDGET</span><b>•</b><span>STREAKS</span><b>•</b>
+      </div>
+    </div>
+
+    <!-- SKINS -->
+    <section class="skins" id="skins">
+      <div class="band-head">
+        <p class="eyebrow light">SIX LOOKS · ONE RITUAL</p>
+        <h2 class="display">Pick a vibe. The whole gadget changes.</h2>
+        <p class="band-lede">
+          The same little timer, re-skinned head to toe — casing, screen, glow and all.
+          Pick one in Settings and it previews live before you commit. Match your wallpaper or your mood.
+        </p>
+      </div>
+      <div class="skin-grid">
+        <figure><img src="assets/img/theme-lcd.png" alt="Game Boy skin" loading="lazy" /><figcaption>Game Boy</figcaption></figure>
+        <figure><img src="assets/img/theme-midnight.png" alt="Midnight skin" loading="lazy" /><figcaption>Midnight</figcaption></figure>
+        <figure><img src="assets/img/theme-neon.png" alt="Neon skin" loading="lazy" /><figcaption>Neon</figcaption></figure>
+        <figure><img src="assets/img/theme-sunset.png" alt="Sunset skin" loading="lazy" /><figcaption>Sunset</figcaption></figure>
+        <figure><img src="assets/img/theme-aurora.png" alt="Aurora skin" loading="lazy" /><figcaption>Aurora</figcaption></figure>
+        <figure><img src="assets/img/theme-mono.png" alt="Mono skin" loading="lazy" /><figcaption>Mono</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- GROW -->
+    <section class="grow" id="grow">
+      <div class="grow-inner">
+        <div class="grow-copy">
+          <p class="eyebrow">THE HOOK</p>
+          <h2 class="display">Tiny now.<br />Fully grown by Friday.</h2>
+          <p class="band-lede">
+            Every finished session feeds your pet and nudges it bigger. Hit your daily goal
+            and it reaches full size. Six friends to raise — pick one, or collect the set.
+          </p>
+          <div class="grow-pets" id="grow-pets"></div>
+        </div>
+        <div class="grow-stage">
+          <div class="evo">
+            <div class="evo-cell"><canvas width="60" height="60" data-pet="cat"></canvas><span>Baby</span></div>
+            <div class="evo-arrow">→</div>
+            <div class="evo-cell"><canvas width="92" height="92" data-pet="cat"></canvas><span>Growing</span></div>
+            <div class="evo-arrow">→</div>
+            <div class="evo-cell big"><canvas width="128" height="128" data-pet="cat"></canvas><span>Grown</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features" id="features">
+      <div class="band-head">
+        <p class="eyebrow light">EVERYTHING, NOTHING IN THE WAY</p>
+        <h2 class="display">Small window. Serious focus tools.</h2>
+      </div>
+      <div class="feat-grid">
+        <article class="feat feat-wide">
+          <h3>Sound that sets the mood</h3>
+          <p>Built-in lo-fi and ambient loops — rain, ocean, white noise, café — each with its own volume. Point it at <em>any</em> folder of your own songs and it plays them as a playlist; fast-forward or skip right from the speaker grille, which dances to whatever’s playing.</p>
+        </article>
+        <article class="feat feat-dark">
+          <h3>Strict mode that bites</h3>
+          <p>List the sites that derail you. During a focus session they get yanked to a blank page the moment you open them — and a full-screen breather takes over your breaks.</p>
+        </article>
+        <article class="feat">
+          <h3>Tasks &amp; pomodoros</h3>
+          <p>Add what you’re working on, estimate it in 🍅, and watch the count fill as you go.</p>
+        </article>
+        <article class="feat">
+          <h3>Stats &amp; streaks</h3>
+          <p>Daily and weekly focus, time by tag, and a streak that’s genuinely hard to break.</p>
+        </article>
+        <article class="feat">
+          <h3>Lives in the menu bar</h3>
+          <p>Drops down from the tray as a draggable little device you can park anywhere — or pop out a tiny always-on-top widget (⌘⇧M) when you want it closer.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- STATS STRIP -->
+    <section class="numbers">
+      <div class="num"><b>25:00</b><span>the only number that matters</span></div>
+      <div class="num"><b>6</b><span>pixel friends to raise</span></div>
+      <div class="num"><b>6</b><span>skins, fully re-styled</span></div>
+      <div class="num"><b>0</b><span>accounts, ads, or trackers</span></div>
+    </section>
+
+    <!-- DOWNLOAD -->
+    <section class="download" id="download">
+      <div class="dl-inner">
+        <p class="eyebrow on-red">READY WHEN YOU ARE</p>
+        <h2 class="display">Start a session. Meet your pet.</h2>
+        <a class="btn-ghost" href="#" id="dl-btn">Download</a>
+        <p class="dl-note" id="dl-note">Pick your platform below.</p>
+        <div class="dl-row" id="dl-row"></div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span class="pixel">POMODORO&nbsp;PET</span>
+      <span>Made for people who get distracted. 🐾</span>
+    </footer>
+
+    <script src="assets/pet.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

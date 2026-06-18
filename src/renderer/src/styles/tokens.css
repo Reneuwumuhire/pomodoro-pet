@@ -1,0 +1,63 @@
+:root {
+  /* Casing (molded plastic / aluminum) */
+  --case-top: #ececec;
+  --case-bottom: #c2c2c2;
+  --case-edge: #a8a8a8;
+  --case-radius: 28px;
+
+  /* Screen bezel */
+  --bezel: #2b2b2b;
+  --bezel-edge: #161616;
+
+  /* LCD screen — olive green, shifts with phase */
+  --lcd-focus: #9aa97f;
+  --lcd-short: #8fb0a0; /* cooler green for breaks */
+  --lcd-long: #b7a98a; /* warmer tan for long break */
+  --lcd-ink: #36402a;
+  --lcd-ink-dim: rgba(54, 64, 42, 0.45);
+
+  /* Buttons */
+  --btn-red-top: #e8463a;
+  --btn-red-bottom: #c8281c;
+  --btn-red-edge: #8f160d;
+  --btn-dark-top: #4a4a4a;
+  --btn-dark-bottom: #2f2f2f;
+  --btn-dark-edge: #161616;
+  --btn-label: #fff;
+
+  /* Speaker / chrome */
+  --grille: #b9b9b9;
+  --grille-hole: rgba(0, 0, 0, 0.28);
+
+  /* On-casing UI chrome (toolbar icons, speaker chips, active-task, now-playing).
+     Defaults suit a light casing; dark themes override these for contrast. */
+  --ui-icon: #555;
+  --ui-chip: rgba(0, 0, 0, 0.05);
+  --ui-chip-hover: rgba(0, 0, 0, 0.1);
+  --ui-surface: rgba(0, 0, 0, 0.04);
+  --ui-text: #444;
+  --ui-muted: #777;
+  --chip-bg: linear-gradient(180deg, #3a3a3a, #2a2a2a);
+  --chip-ink: #ddd;
+
+  /* Settings panel */
+  --panel-bg: #ffffff;
+  --panel-ink: #1d1d1f;
+  --panel-sub: #86868b;
+  --pill-bg: #f0f0f2;
+  --pill-active: #1d1d1f;
+  --pill-active-ink: #ffffff;
+
+  --pixel-font: 'Press Start 2P', ui-monospace, monospace;
+  /* clean digit/label font to match the reference design */
+  --lcd-font: 'Helvetica Neue', 'SF Pro Display', -apple-system, Arial, sans-serif;
+
+  /* themeable surface bits (defaults = Game Boy LCD) */
+  --wrap-bg: radial-gradient(120% 120% at 50% 0%, #f3f3f3, #e2e2e2);
+  --scanline-opacity: 1;
+  --digit-glow: none;
+  --screen-inset: inset 0 0 0 2px rgba(0, 0, 0, 0.18), inset 0 0 18px rgba(0, 0, 0, 0.18);
+  --header-color: var(--lcd-ink-dim);
+  --dot-on: var(--lcd-ink);
+  --case-radius2: var(--case-radius);
+}

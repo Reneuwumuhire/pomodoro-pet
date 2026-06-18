@@ -1,0 +1,164 @@
+/* Selectable widget skins. Each overrides the design tokens; the Game Boy LCD
+   look lives in tokens.css as the default (data-theme="lcd" or unset). */
+
+/* ---- Midnight: dark premium, soft glow, no scanlines ---- */
+[data-theme='midnight'] {
+  --wrap-bg: radial-gradient(120% 120% at 50% 0%, #15171c, #0b0c10);
+  --case-top: #262a33;
+  --case-bottom: #15171c;
+  --case-edge: #0a0b0e;
+  --bezel: #050608;
+  --lcd-focus: #0e1116;
+  --lcd-short: #0c1814;
+  --lcd-long: #181016;
+  --lcd-ink: #eef2f8;
+  --lcd-ink-dim: rgba(238, 242, 248, 0.4);
+  --btn-red-top: #ff5a5a;
+  --btn-red-bottom: #e0231f;
+  --btn-red-edge: #7d0f0c;
+  --btn-dark-top: #2b2f38;
+  --btn-dark-bottom: #1b1e25;
+  --btn-dark-edge: #0a0b0e;
+  --grille: #1b1e25;
+  --grille-hole: rgba(255, 255, 255, 0.06);
+  --scanline-opacity: 0;
+  --digit-glow: 0 0 18px rgba(255, 255, 255, 0.12);
+  --screen-inset: inset 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 0 40px rgba(0, 0, 0, 0.7);
+  --header-color: rgba(238, 242, 248, 0.45);
+  --ui-icon: rgba(255, 255, 255, 0.82);
+  --ui-chip: rgba(255, 255, 255, 0.1);
+  --ui-chip-hover: rgba(255, 255, 255, 0.18);
+  --ui-surface: rgba(255, 255, 255, 0.08);
+  --ui-text: rgba(255, 255, 255, 0.9);
+  --ui-muted: rgba(255, 255, 255, 0.55);
+  --chip-bg: rgba(255, 255, 255, 0.14);
+  --chip-ink: #ffffff;
+}
+
+/* ---- Mono: Braun / TE minimal, light, orange accent ---- */
+[data-theme='mono'] {
+  --wrap-bg: linear-gradient(180deg, #fafafa, #eceae6);
+  --case-top: #fdfdfd;
+  --case-bottom: #e6e4de;
+  --case-edge: #d2cfc7;
+  --bezel: #cfccc3;
+  --lcd-focus: #e7e4db;
+  --lcd-short: #dfe6df;
+  --lcd-long: #ece2d6;
+  --lcd-ink: #1c1c1c;
+  --lcd-ink-dim: rgba(28, 28, 28, 0.4);
+  --btn-red-top: #ff6a33;
+  --btn-red-bottom: #f1500f;
+  --btn-red-edge: #b53a08;
+  --btn-dark-top: #3a3a3a;
+  --btn-dark-bottom: #2a2a2a;
+  --btn-dark-edge: #161616;
+  --grille: #dcd9d2;
+  --grille-hole: rgba(0, 0, 0, 0.2);
+  --scanline-opacity: 0;
+  --digit-glow: none;
+  --screen-inset: inset 0 2px 6px rgba(0, 0, 0, 0.12);
+  --header-color: rgba(28, 28, 28, 0.4);
+}
+
+/* ---- Sunset: warm coral gradient ---- */
+[data-theme='sunset'] {
+  --wrap-bg: radial-gradient(130% 130% at 50% 0%, #ffb38a, #ff7e6b);
+  --case-top: #ffd9c2;
+  --case-bottom: #ff9f7e;
+  --case-edge: #e87a5c;
+  --bezel: #7a3b2e;
+  --lcd-focus: #ffe9d6;
+  --lcd-short: #ffe2d0;
+  --lcd-long: #ffd9c9;
+  --lcd-ink: #7a3f23;
+  --lcd-ink-dim: rgba(122, 63, 35, 0.45);
+  --btn-red-top: #ff5d8f;
+  --btn-red-bottom: #d6336c;
+  --btn-red-edge: #9c1f4c;
+  --btn-dark-top: #6b4233;
+  --btn-dark-bottom: #4f2f23;
+  --btn-dark-edge: #2a160f;
+  --grille: #f0c3a8;
+  --grille-hole: rgba(122, 63, 35, 0.25);
+  --scanline-opacity: 0.4;
+  --digit-glow: none;
+  --screen-inset: inset 0 0 0 2px rgba(122, 63, 35, 0.12), inset 0 0 18px rgba(122, 63, 35, 0.15);
+  --header-color: rgba(122, 63, 35, 0.5);
+  --ui-icon: #7a3f23;
+  --ui-chip: rgba(122, 63, 35, 0.12);
+  --ui-chip-hover: rgba(122, 63, 35, 0.2);
+  --ui-surface: rgba(122, 63, 35, 0.1);
+  --ui-text: #6e3618;
+  --ui-muted: rgba(122, 63, 35, 0.62);
+  --chip-bg: linear-gradient(180deg, #6b4233, #4f2f23);
+  --chip-ink: #ffe9d6;
+}
+
+/* ---- Aurora: cool indigo glass, cyan glow ---- */
+[data-theme='aurora'] {
+  --wrap-bg: radial-gradient(130% 130% at 50% 0%, #2a1b5e, #0b1130);
+  --case-top: #2c2150;
+  --case-bottom: #171036;
+  --case-edge: #0d0a22;
+  --bezel: #0a0820;
+  --lcd-focus: #0c1430;
+  --lcd-short: #0a1a2e;
+  --lcd-long: #1a0f2e;
+  --lcd-ink: #9bf6ff;
+  --lcd-ink-dim: rgba(155, 246, 255, 0.4);
+  --btn-red-top: #2ee6e6;
+  --btn-red-bottom: #0bb6c4;
+  --btn-red-edge: #077a86;
+  --btn-dark-top: #3a2f66;
+  --btn-dark-bottom: #241b4a;
+  --btn-dark-edge: #120c2a;
+  --grille: #1a1442;
+  --grille-hole: rgba(155, 246, 255, 0.12);
+  --scanline-opacity: 0.3;
+  --digit-glow: 0 0 22px rgba(34, 211, 238, 0.5);
+  --screen-inset: inset 0 0 0 1px rgba(155, 246, 255, 0.08), inset 0 0 40px rgba(0, 0, 0, 0.6);
+  --header-color: rgba(155, 246, 255, 0.55);
+  --ui-icon: rgba(220, 240, 255, 0.85);
+  --ui-chip: rgba(155, 246, 255, 0.12);
+  --ui-chip-hover: rgba(155, 246, 255, 0.22);
+  --ui-surface: rgba(155, 246, 255, 0.1);
+  --ui-text: rgba(230, 245, 255, 0.92);
+  --ui-muted: rgba(155, 246, 255, 0.6);
+  --chip-bg: rgba(155, 246, 255, 0.16);
+  --chip-ink: #eafdff;
+}
+
+/* ---- Neon: synthwave, magenta + cyan glow, scanlines ---- */
+[data-theme='neon'] {
+  --wrap-bg: radial-gradient(130% 130% at 50% 120%, #2a0a3a, #08060f);
+  --case-top: #1a1226;
+  --case-bottom: #0a0712;
+  --case-edge: #050309;
+  --bezel: #050309;
+  --lcd-focus: #120a1f;
+  --lcd-short: #0a1320;
+  --lcd-long: #1f0a18;
+  --lcd-ink: #ff7ae0;
+  --lcd-ink-dim: rgba(255, 122, 224, 0.4);
+  --btn-red-top: #ff4dd2;
+  --btn-red-bottom: #d61f9c;
+  --btn-red-edge: #8a0f63;
+  --btn-dark-top: #1a2233;
+  --btn-dark-bottom: #0e1422;
+  --btn-dark-edge: #05080f;
+  --grille: #140a1f;
+  --grille-hole: rgba(34, 245, 255, 0.18);
+  --scanline-opacity: 1;
+  --digit-glow: 0 0 14px rgba(255, 122, 224, 0.8), 0 0 30px rgba(34, 245, 255, 0.4);
+  --screen-inset: inset 0 0 0 1px rgba(255, 122, 224, 0.15), inset 0 0 40px rgba(0, 0, 0, 0.7);
+  --header-color: rgba(34, 245, 255, 0.6);
+  --ui-icon: rgba(255, 235, 250, 0.85);
+  --ui-chip: rgba(255, 122, 224, 0.14);
+  --ui-chip-hover: rgba(255, 122, 224, 0.26);
+  --ui-surface: rgba(255, 122, 224, 0.12);
+  --ui-text: rgba(255, 240, 252, 0.92);
+  --ui-muted: rgba(34, 245, 255, 0.65);
+  --chip-bg: rgba(255, 122, 224, 0.18);
+  --chip-ink: #ffeafb;
+}
