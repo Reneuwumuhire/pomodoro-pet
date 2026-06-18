@@ -197,20 +197,20 @@ a { color: inherit; text-decoration: none; }
   animation: floaty 6s ease-in-out infinite;
 }
 @keyframes floaty { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-10px) } }
-/* control tab that protrudes above the body */
-.d-toolbar { display: flex; justify-content: flex-end; margin-bottom: -16px; position: relative; z-index: 2; }
+/* controls in a rounded pill at the top-right, inside the card */
+.d-toolbar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
 .d-pill {
-  display: flex; align-items: center; gap: 1px; padding: 5px;
-  border-radius: 14px 14px 0 0;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--dev-case-top) 82%, #fff), var(--dev-case-top));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
+  display: flex; align-items: center; gap: 1px; padding: 4px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--dev-ink) 8%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--dev-ink) 16%, transparent);
 }
 .d-tool { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; color: var(--dev-ink); opacity: .72; }
 .d-tool svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .d-tool svg .fill { fill: currentColor; stroke: none; }
 .d-div { width: 1px; align-self: stretch; margin: 4px 2px; background: color-mix(in srgb, var(--dev-ink) 25%, transparent); }
 .device {
-  padding: 26px 16px 16px; border-radius: 30px 0 30px 30px;
+  padding: 12px 16px 16px; border-radius: 24px;
   background: linear-gradient(180deg, var(--dev-case-top), var(--dev-case-bot));
   box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 26px 50px rgba(0,0,0,.32);
   transition: background 0.4s ease;
@@ -378,3 +378,13 @@ a { color: inherit; text-decoration: none; }
 .foot-mid { text-align: center; line-height: 1.5; }
 .foot-mid small { font-size: 11px; opacity: 0.7; }
 .foot-mid small a { color: rgba(255, 255, 255, 0.8); border-bottom: 1px solid rgba(255, 255, 255, 0.25); }
+
+/* ===== mobile: keep the pet-evolution box from overflowing ===== */
+@media (max-width: 600px) {
+  .evo { gap: 6px; padding: 16px 10px; }
+  .evo-cell:nth-child(1) canvas { width: 40px; height: 40px; }   /* baby */
+  .evo-cell:nth-child(3) canvas { width: 60px; height: 60px; }   /* growing */
+  .evo-cell.big canvas { width: 84px; height: 84px; }            /* grown */
+  .evo-arrow { font-size: 18px; }
+  .grow-pets canvas { width: 46px; height: 46px; }
+}

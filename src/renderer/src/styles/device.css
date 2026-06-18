@@ -1049,13 +1049,14 @@ input[type='range'] {
   background: transparent;
 }
 .panel-body .device-wrap {
-  /* Transparent window container with a uniform margin so the macOS window
-     shadow wraps the card as a clean rounded rectangle (like a Finder window). */
+  /* The card fills the window edge-to-edge so the native macOS window shadow
+     hugs the rounded rectangle tightly (matching a Finder window) instead of
+     being offset by a transparent margin. */
   min-height: 100vh;
   justify-content: flex-start;
   align-items: stretch;
   gap: 0;
-  padding: 14px;
+  padding: 0;
   background: transparent;
   -webkit-app-region: drag;
 }
