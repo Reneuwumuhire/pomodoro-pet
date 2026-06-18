@@ -344,7 +344,7 @@ export function createTray(engine: TimerEngine): Tray {
   if (image.isEmpty()) image = nativeImage.createEmpty()
   if (isMac) image.setTemplateImage(true)
   tray = new Tray(image)
-  tray.setToolTip('Pomodoro Pet')
+  tray.setToolTip('Petomato')
 
   const refresh = (): void => {
     if (!tray || tray.isDestroyed()) return

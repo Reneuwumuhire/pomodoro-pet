@@ -1,14 +1,14 @@
-# Pomodoro Pet 🥚🐾
+# Petomato 🥚🐾
 
-[![Latest release](https://img.shields.io/github/v/release/Reneuwumuhire/pomodoro-pet?color=e8463a)](https://github.com/Reneuwumuhire/pomodoro-pet/releases)
-[![Downloads](https://img.shields.io/github/downloads/Reneuwumuhire/pomodoro-pet/total?color=2ea44f&label=downloads)](https://github.com/Reneuwumuhire/pomodoro-pet/releases)
-[![Stars](https://img.shields.io/github/stars/Reneuwumuhire/pomodoro-pet?style=flat)](https://github.com/Reneuwumuhire/pomodoro-pet/stargazers)
+[![Latest release](https://img.shields.io/github/v/release/Reneuwumuhire/petomato?color=e8463a)](https://github.com/Reneuwumuhire/petomato/releases)
+[![Downloads](https://img.shields.io/github/downloads/Reneuwumuhire/petomato/total?color=2ea44f&label=downloads)](https://github.com/Reneuwumuhire/petomato/releases)
+[![Stars](https://img.shields.io/github/stars/Reneuwumuhire/petomato?style=flat)](https://github.com/Reneuwumuhire/petomato/stargazers)
 
 A retro **LCD-gadget Pomodoro timer** for **macOS and Windows**, built with Electron + React. A
 pixel pet wakes up and grows as you complete focus sessions. Lives in the menu bar / system tray,
 with an optional always-on-top mini widget and a strict-mode fullscreen break.
 
-🌐 **Website:** https://reneuwumuhire.github.io/pomodoro-pet/ · **Created by [Rene Uwumuhire](https://github.com/Reneuwumuhire)**
+🌐 **Website:** https://reneuwumuhire.github.io/petomato/ · **Created by [Rene Uwumuhire](https://github.com/Reneuwumuhire)**
 
 > Platform note: the timer, pet, six skins, audio, tasks, stats, mini widget and strict-mode
 > break run on both macOS and Windows. The **Focus Shield** (active-tab site blocking) is
@@ -107,8 +107,8 @@ pnpm typecheck
 ## Build
 
 ```bash
-pnpm dist          # macOS  -> dist/Pomodoro Pet-<version>-arm64.dmg
-pnpm dist:win      # Windows -> dist/Pomodoro Pet Setup <version>.exe  (NSIS installer)
+pnpm dist          # macOS  -> dist/Petomato-<version>-arm64.dmg
+pnpm dist:win      # Windows -> dist/Petomato Setup <version>.exe  (NSIS installer)
 ```
 
 `pnpm dist` produces an **arm64**, unsigned `.dmg` (add `- x64`/`- universal` under

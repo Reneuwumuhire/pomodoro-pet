@@ -1,4 +1,4 @@
-# Pomodoro Pet — landing site
+# Petomato — landing site
 
 A single-page, dependency-free marketing site. Bold "electronics catalog" design:
 material-blocked sections (silver casing → ink → green LCD → bone → red), a live

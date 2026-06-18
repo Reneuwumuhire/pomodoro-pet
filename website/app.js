@@ -139,7 +139,7 @@ document.querySelectorAll('section > .band-head, .hero-copy, .hero-device, .feat
 // --- OS-aware downloads ----------------------------------------------------
 // Point at the GitHub Releases page (swap `file` for a direct asset URL once a
 // release is published, or drop the built files next to this page).
-const RELEASES = 'https://github.com/Reneuwumuhire/pomodoro-pet/releases'
+const RELEASES = 'https://github.com/Reneuwumuhire/petomato/releases'
 const DOWNLOADS = {
   mac: {
     os: 'macOS',
@@ -198,7 +198,7 @@ function detectOS() {
 ;(function loadDownloadCount() {
   const el = document.getElementById('dl-count')
   if (!el) return
-  fetch('https://api.github.com/repos/Reneuwumuhire/pomodoro-pet/releases')
+  fetch('https://api.github.com/repos/Reneuwumuhire/petomato/releases')
     .then((r) => (r.ok ? r.json() : []))
     .then((rels) => {
       const total = (rels || []).reduce(

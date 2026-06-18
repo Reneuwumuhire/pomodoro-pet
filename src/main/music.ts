@@ -38,7 +38,7 @@ export function isCustomMusicDir(): boolean {
   return isDir(getSettings().musicFolder)
 }
 
-const README = `Pomodoro Pet — custom music
+const README = `Petomato — custom music
 ============================
 
 MUSIC — drop any songs here (.mp3, .m4a, .wav, .ogg, .flac).

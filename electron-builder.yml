@@ -1,5 +1,5 @@
-appId: com.rene.pomodoropet
-productName: Pomodoro Pet
+appId: com.rene.petomato
+productName: Petomato
 directories:
   buildResources: resources
   output: dist
@@ -21,7 +21,7 @@ mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
     NSAppleEventsUsageDescription: >-
-      Pomodoro Pet checks the active app and browser tab to block distractions
+      Petomato checks the active app and browser tab to block distractions
       during strict-mode focus sessions.
   target:
     - target: dmg
@@ -33,7 +33,7 @@ mac:
   # Unsigned build. To sign/notarize later, set CSC_LINK + CSC_KEY_PASSWORD
   # and add notarize config / Apple credentials.
 dmg:
-  title: Pomodoro Pet
+  title: Petomato
 win:
   # Build with `pnpm dist:win` (best run on Windows, or on macOS with wine).
   icon: resources/icon.ico
@@ -46,4 +46,4 @@ nsis:
   perMachine: false
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
-  shortcutName: Pomodoro Pet
+  shortcutName: Petomato
