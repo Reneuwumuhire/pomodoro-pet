@@ -131,3 +131,10 @@ to wire up the download link and deploy.
 node scripts/gen-assets.mjs   # app icon + anti-aliased menu-bar clock
 # audio loops are generated with ffmpeg (synthesized, royalty-free)
 ```
+
+## Credits
+
+- **Created by** [Rene Uwumuhire](https://github.com/Reneuwumuhire).
+- **Design inspiration:** [Pomodoro — Web Design](https://dribbble.com/shots/27126923-Pomodoro-Web-Design)
+  by **Arip for kiwari** on Dribbble.
+- Icons by [Lucide](https://lucide.dev) (via `react-icons`); fonts: Bricolage Grotesque + Press Start 2P.

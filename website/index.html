@@ -52,28 +52,43 @@
 
         <!-- LIVE INTERACTIVE DEVICE -->
         <div class="hero-device">
-          <div class="device" id="device">
-            <div class="lcd">
-              <div class="lcd-inner">
-                <div class="lcd-head" id="d-phase">SESSION 1</div>
-                <div class="lcd-time" id="d-time">25:00</div>
-                <canvas class="lcd-pet" id="d-pet" width="120" height="120"></canvas>
-                <div class="lcd-dots" id="d-dots"></div>
+          <div class="device-stack">
+            <!-- control tab -->
+            <div class="d-toolbar" aria-hidden="true">
+              <div class="d-pill">
+                <span class="d-tool"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></span>
+                <span class="d-tool"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 16v-5M12 16V8M17 16v-3"/></svg></span>
+                <span class="d-tool"><svg viewBox="0 0 24 24"><polygon class="fill" points="6 4 15 12 6 20"/><path d="M19 5v14"/></svg></span>
+                <span class="d-tool"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><rect class="fill" x="11" y="11" width="8" height="6" rx="1"/></svg></span>
+                <span class="d-tool"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg></span>
+                <span class="d-div"></span>
+                <span class="d-tool"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></span>
               </div>
-              <div class="lcd-scan"></div>
-              <div class="lcd-glare"></div>
             </div>
-            <div class="d-controls">
-              <button class="d-btn d-red" id="d-toggle">
-                <span class="d-label">START</span><span class="d-ico">▶</span>
-              </button>
-              <button class="d-btn d-dark" id="d-reset">
-                <span class="d-label">RESET</span><span class="d-ico">↺</span>
-              </button>
-            </div>
-            <div class="d-speaker">
-              <span class="d-chip">🔊</span>
-              <canvas class="d-grille" id="d-grille"></canvas>
+            <div class="device" id="device">
+              <div class="lcd">
+                <div class="lcd-inner">
+                  <div class="lcd-head" id="d-phase">SESSION 1</div>
+                  <div class="lcd-time" id="d-time">25:00</div>
+                  <canvas class="lcd-pet" id="d-pet" width="120" height="120"></canvas>
+                  <div class="lcd-dots" id="d-dots"></div>
+                </div>
+                <div class="lcd-scan"></div>
+                <div class="lcd-glare"></div>
+              </div>
+              <div class="d-controls">
+                <button class="d-btn d-red" id="d-toggle">
+                  <span class="d-label">START</span><span class="d-ico">▶</span>
+                </button>
+                <button class="d-btn d-dark" id="d-reset">
+                  <span class="d-label">RESET</span><span class="d-ico">↺</span>
+                </button>
+              </div>
+              <div class="d-speaker">
+                <span class="d-chip">🔊</span>
+                <canvas class="d-grille" id="d-grille"></canvas>
+              </div>
+              <div class="d-task">＋ Pick a task to focus on</div>
             </div>
           </div>
           <div class="skin-switch" id="skin-switch" aria-label="Try a skin"></div>
@@ -196,6 +211,16 @@
         <a href="https://github.com/Reneuwumuhire" target="_blank" rel="noopener">Rene&nbsp;Uwumuhire</a>
         ·
         <a href="https://github.com/Reneuwumuhire/pomodoro-pet" target="_blank" rel="noopener">GitHub</a>
+        <br />
+        <small
+          >Design inspired by
+          <a
+            href="https://dribbble.com/shots/27126923-Pomodoro-Web-Design"
+            target="_blank"
+            rel="noopener"
+            >Arip for kiwari</a
+          ></small
+        >
       </span>
       <span>Made for people who get distracted. 🐾</span>
     </footer>
