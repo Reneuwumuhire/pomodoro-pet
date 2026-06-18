@@ -164,7 +164,7 @@ function detectOS() {
   return 'other'
 }
 
-;(function setupDownloads() {
+function applyDownloads() {
   const os = detectOS()
   const primaryKey = os === 'win' ? 'win' : 'mac' // default unknown/Linux to mac
   const otherKey = primaryKey === 'mac' ? 'win' : 'mac'
@@ -188,30 +188,42 @@ function detectOS() {
       const a = document.createElement('a')
       a.href = d.file
       a.className = 'dl-pill' + (key === primaryKey ? ' on' : '')
-      a.textContent = `${key === 'mac' ? '' : ''}${d.os}`
+      a.textContent = d.os
       el.appendChild(a)
     }
   })
-})()
+}
+applyDownloads() // initial: links fall back to the Releases page
 
-// --- live download count (GitHub Releases API) -----------------------------
-;(function loadDownloadCount() {
-  const el = document.getElementById('dl-count')
-  if (!el) return
-  fetch('https://api.github.com/repos/Reneuwumuhire/petomato/releases')
-    .then((r) => (r.ok ? r.json() : []))
-    .then((rels) => {
-      const total = (rels || []).reduce(
-        (sum, rel) => sum + (rel.assets || []).reduce((s, a) => s + (a.download_count || 0), 0),
-        0
-      )
-      if (total > 0) {
-        el.textContent = `⬇ ${total.toLocaleString()} download${total === 1 ? '' : 's'} so far`
-        el.hidden = false
+// Fetch the latest release: rewire the buttons to direct asset downloads (so a
+// click downloads the file instead of opening GitHub) and show the count.
+fetch('https://api.github.com/repos/Reneuwumuhire/petomato/releases')
+  .then((r) => (r.ok ? r.json() : []))
+  .then((rels) => {
+    rels = rels || []
+    const rel = rels.find((r) => !r.draft && (r.assets || []).length) || rels[0]
+    if (rel) {
+      const url = (re) => {
+        const a = (rel.assets || []).find((x) => re.test(x.name))
+        return a && a.browser_download_url
       }
-    })
-    .catch(() => {})
-})()
+      const mac = url(/\.dmg$/i)
+      const win = url(/\.exe$/i)
+      if (mac) DOWNLOADS.mac.file = mac
+      if (win) DOWNLOADS.win.file = win
+      if (mac || win) applyDownloads()
+    }
+    const total = rels.reduce(
+      (sum, r) => sum + (r.assets || []).reduce((s, a) => s + (a.download_count || 0), 0),
+      0
+    )
+    const el = document.getElementById('dl-count')
+    if (el && total > 0) {
+      el.textContent = `⬇ ${total.toLocaleString()} download${total === 1 ? '' : 's'} so far`
+      el.hidden = false
+    }
+  })
+  .catch(() => {})
 
 // --- boot ------------------------------------------------------------------
 renderDots()
