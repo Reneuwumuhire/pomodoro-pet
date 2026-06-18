@@ -4,6 +4,8 @@ A retro **LCD-gadget Pomodoro timer** for **macOS and Windows**, built with Elec
 pixel pet wakes up and grows as you complete focus sessions. Lives in the menu bar / system tray,
 with an optional always-on-top mini widget and a strict-mode fullscreen break.
 
+🌐 **Website:** https://reneuwumuhire.github.io/pomodoro-pet/
+
 > Platform note: the timer, pet, six skins, audio, tasks, stats, mini widget and strict-mode
 > break run on both macOS and Windows. The **Focus Shield** (active-tab site blocking) is
 > macOS-only for now — it uses AppleScript; on Windows it's disabled rather than misbehaving.
