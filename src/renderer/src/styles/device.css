@@ -1133,6 +1133,7 @@ input[type='range'] {
   margin-top: 8px;
   min-height: 14px;
   opacity: 0.95;
+  visibility: hidden; /* only shown by the speaker bar when a track is playing */
 }
 .now-playing span {
   max-width: 220px;
