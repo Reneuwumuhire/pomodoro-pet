@@ -64,10 +64,14 @@ fn raise_above_everything(win: &tauri::WebviewWindow) {
     if let Ok(ptr) = win.ns_window() {
         let ns = ptr as *mut AnyObject;
         // NSScreenSaverWindowLevel = 1000; collectionBehavior = CanJoinAllSpaces (1)
-        // | FullScreenAuxiliary (1<<8).
+        // | FullScreenAuxiliary (1<<8). Also lock it so it can't be dragged — tao
+        // makes borderless windows movable-by-background, which is what let the user
+        // drag the break overlay.
         unsafe {
             let _: () = msg_send![ns, setLevel: 1000isize];
             let _: () = msg_send![ns, setCollectionBehavior: 1usize | (1usize << 8)];
+            let _: () = msg_send![ns, setMovable: false];
+            let _: () = msg_send![ns, setMovableByWindowBackground: false];
         }
     }
 }
@@ -177,13 +181,24 @@ pub fn show_blocker(app: &AppHandle, site: &str) {
             .decorations(false)
             .always_on_top(true)
             .skip_taskbar(true)
-            .maximized(true)
+            .visible(false)
             .build()
             .expect("build blocker")
     });
-    let _ = win.set_fullscreen(true);
-    let _ = win.emit("blocker-site", site); // update the site when already open
+    let _ = win.emit("blocker-site", site); // update the site even when already open
+    if win.is_visible().unwrap_or(false) {
+        return;
+    }
+    let _ = win.set_visible_on_all_workspaces(true);
+    if let Ok(Some(mon)) = app.primary_monitor() {
+        let p = mon.position();
+        let s = mon.size();
+        let _ = win.set_position(PhysicalPosition::new(p.x, p.y));
+        let _ = win.set_size(tauri::PhysicalSize::new(s.width, s.height));
+    }
     let _ = win.show();
+    let _ = win.set_focus();
+    raise_above_everything(&win); // above everything + not draggable
 }
 pub fn hide_blocker(app: &AppHandle) {
     if let Some(w) = app.get_webview_window("blocker") { let _ = w.hide(); }
