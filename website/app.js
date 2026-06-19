@@ -144,8 +144,8 @@ const DOWNLOADS = {
   mac: {
     os: 'macOS',
     file: RELEASES,
-    short: 'Apple silicon',
-    note: 'macOS (Apple silicon) · unsigned build — right-click the app → Open the first time.'
+    short: 'Apple Silicon & Intel',
+    note: 'macOS 13+ (Apple Silicon & Intel) · unsigned build — right-click the app → Open the first time.'
   },
   win: {
     os: 'Windows',
