@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { usePomodoro } from '@/state/usePomodoro'
-import { connectElement, resume, setPlaying } from './audioBus'
+import { connectElement, resume, setElementVolume, setPlaying } from './audioBus'
 import { prettyTrack, setMusicHandlers } from './musicControls'
 
 import lofi1Url from '../assets/audio/lofi1.mp3'
@@ -154,7 +154,7 @@ export function useAudio(): void {
 
     // ---- music ----
     if (musicEnabled && running) {
-      m.volume = Math.max(0, Math.min(1, s.musicVolume * master))
+      setElementVolume(m, s.musicVolume * master)
       if (lib.length) {
         // playlist mode — keep playing the current song, advancing on end
         m.loop = false
@@ -188,7 +188,7 @@ export function useAudio(): void {
         a.src = aUrl
         a.dataset.url = aUrl
       }
-      a.volume = Math.max(0, Math.min(1, s.ambientVolume * master))
+      setElementVolume(a, s.ambientVolume * master)
       resume()
       if (a.paused) void a.play().catch(() => {})
     } else if (!a.paused) {
