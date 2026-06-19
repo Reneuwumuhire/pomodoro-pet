@@ -17,10 +17,10 @@ pub fn pause(state: State<AppState>, app: AppHandle) { state.engine.lock().unwra
 #[tauri::command]
 pub fn reset(state: State<AppState>, app: AppHandle) { state.engine.lock().unwrap().reset(); broadcast(&app); }
 #[tauri::command]
-pub fn skip(state: State<AppState>, app: AppHandle) { state.engine.lock().unwrap().advance(); broadcast(&app); }
+pub fn skip(state: State<AppState>, app: AppHandle) { state.engine.lock().unwrap().advance(false); broadcast(&app); }
 #[tauri::command]
 pub fn focus_now(state: State<AppState>, app: AppHandle) {
-    { let mut e = state.engine.lock().unwrap(); e.phase = Phase::Focus; e.reset(); e.start(); }
+    state.engine.lock().unwrap().focus_now();
     broadcast(&app);
 }
 
@@ -36,10 +36,12 @@ pub fn update_settings(partial: Value, state: State<AppState>, app: AppHandle) -
         if let (Some(obj), Some(p)) = (cur.as_object_mut(), partial.as_object()) {
             for (k, v) in p { obj.insert(k.clone(), v.clone()); }
         }
-        if let Ok(s) = serde_json::from_value::<Settings>(cur) { e.settings = s; }
+        let merged = serde_json::from_value::<Settings>(cur).unwrap_or_else(|_| e.settings.clone());
+        e.apply_settings(merged); // recomputes durations when not running, like applySettings()
         e.snapshot()
     };
     store::save_settings(&app, &snap.settings);
+    crate::windows::sync_strict(&app);
     broadcast(&app);
     snap
 }
@@ -104,7 +106,10 @@ pub fn tasks_reorder(ids: Vec<String>, app: AppHandle) -> Vec<Task> {
 
 #[tauri::command]
 pub fn tasks_set_active(id: Option<String>, state: State<AppState>, app: AppHandle) -> TimerState {
-    let snap = { let mut e = state.engine.lock().unwrap(); e.active_task_id = id; e.snapshot() };
+    // don't activate a task that no longer exists (matches setActiveTaskId)
+    let valid = id.filter(|i| store::load_tasks(&app).iter().any(|t| &t.id == i));
+    store::save_active_task(&app, &valid);
+    let snap = { let mut e = state.engine.lock().unwrap(); e.active_task_id = valid; e.snapshot() };
     broadcast(&app);
     snap
 }
@@ -180,7 +185,10 @@ pub fn audio_set_folder(path: String, state: State<AppState>, app: AppHandle) ->
 
 // ── Focus shield ─────────────────────────────────────────────────────────────
 #[tauri::command]
-pub fn blocker_snooze() { crate::focus_guard::snooze(6); }
+pub fn blocker_snooze(app: AppHandle) {
+    crate::focus_guard::snooze(6);
+    crate::windows::hide_blocker(&app);
+}
 #[tauri::command]
 pub fn blocker_test() -> Value { crate::focus_guard::test_once() }
 

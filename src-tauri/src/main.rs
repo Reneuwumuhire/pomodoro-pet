@@ -10,11 +10,12 @@ mod windows;
 
 use std::sync::Mutex;
 use tauri::{
-    menu::{Menu, MenuItem},
-    tray::TrayIconBuilder,
+    menu::{Menu, MenuItem, PredefinedMenuItem},
+    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
     Manager,
 };
-use timer::{spawn_tick_loop, AppState, TimerEngine};
+use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
+use timer::{broadcast, spawn_tick_loop, AppState, TimerEngine};
 
 fn main() {
     tauri::Builder::default()
@@ -23,33 +24,55 @@ fn main() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_http::init())
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .setup(|app| {
-            // load persisted settings, seed the engine, register shared state
-            let settings = store::load_settings(app.handle());
-            app.manage(AppState { engine: Mutex::new(TimerEngine::new(settings)) });
+            // load persisted state, seed the engine, register shared state
+            let h = app.handle();
+            let settings = store::load_settings(h);
+            let mut engine = TimerEngine::new(settings, store::completed_today(h));
+            engine.active_task_id = store::load_active_task(h);
+            app.manage(AppState { engine: Mutex::new(engine) });
 
-            // menu-bar tray with the live countdown as its title (macOS) / tooltip (Windows)
-            let show = MenuItem::with_id(app, "show", "Open Petomato", true, None::<&str>)?;
+            // menu-bar tray: live countdown title + context menu mirroring the Electron app
+            let toggle = MenuItem::with_id(app, "toggle", "Start / Pause", true, None::<&str>)?;
+            let reset = MenuItem::with_id(app, "reset", "Reset", true, None::<&str>)?;
+            let skip = MenuItem::with_id(app, "skip", "Skip", true, None::<&str>)?;
+            let open = MenuItem::with_id(app, "show", "Open Petomato", true, None::<&str>)?;
+            let mini = MenuItem::with_id(app, "mini", "Toggle Mini Widget", true, Some("Cmd+Shift+M"))?;
             let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
-            let menu = Menu::with_items(app, &[&show, &quit])?;
+            let sep1 = PredefinedMenuItem::separator(app)?;
+            let sep2 = PredefinedMenuItem::separator(app)?;
+            let menu = Menu::with_items(app, &[&toggle, &reset, &skip, &sep1, &open, &mini, &sep2, &quit])?;
             let _tray = TrayIconBuilder::with_id("tray")
                 .icon(app.default_window_icon().unwrap().clone())
+                .icon_as_template(true)
                 .menu(&menu)
+                .show_menu_on_left_click(false)
                 .on_menu_event(|app, e| match e.id.as_ref() {
-                    "quit" => app.exit(0),
+                    "toggle" => { app.state::<AppState>().engine.lock().unwrap().toggle(); broadcast(app); }
+                    "reset" => { app.state::<AppState>().engine.lock().unwrap().reset(); broadcast(app); }
+                    "skip" => { app.state::<AppState>().engine.lock().unwrap().advance(false); broadcast(app); }
                     "show" => windows::show_main(app),
+                    "mini" => windows::toggle_mini(app),
+                    "quit" => app.exit(0),
                     _ => {}
                 })
-                .on_tray_icon_event(|tray, _event| windows::toggle_main(tray.app_handle()))
+                .on_tray_icon_event(|tray, event| {
+                    if let TrayIconEvent::Click { button: MouseButton::Left, button_state: MouseButtonState::Up, .. } = event {
+                        windows::toggle_main(tray.app_handle());
+                    }
+                })
                 .build(app)?;
 
-            // NOTE: temporarily Regular (Dock icon, activates on launch) for testing so the
-            // window reliably comes to the front. Restore Accessory for the menu-bar popover.
-            // #[cfg(target_os = "macos")]
-            // app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+            // Global shortcut ⌘⇧M → toggle the mini widget (matches the Electron build).
+            let mini_sc = Shortcut::new(Some(Modifiers::SUPER | Modifiers::SHIFT), Code::KeyM);
+            app.global_shortcut().on_shortcut(mini_sc, |app, _sc, ev| {
+                if ev.state() == ShortcutState::Pressed { windows::toggle_mini(app); }
+            })?;
 
-            // Popover behaviour: float over other apps incl. fullscreen Spaces, like the
-            // Electron build's menu-bar popover.
+            // TODO(final step): restore the menu-bar popover chrome — set_activation_policy(Accessory),
+            // transparent + decorations:false + hide-on-blur. Kept as a normal visible window for now
+            // so the functional parity (timer/tasks/stats/mini/strict/blocker) can be tested first.
             if let Some(w) = app.get_webview_window("main") {
                 let _ = w.center();
                 let _ = w.show();

@@ -1,7 +1,42 @@
 //! Window lifecycle (replaces `windows.ts`). Tauri multi-window: each renderer entry
 //! (index/mini/strict/blocked/about) is its own `WebviewWindow`. The "single-widget
 //! rule" (main and mini never both shown) is enforced here.
+use crate::model::{Phase, Status};
+use crate::timer::AppState;
 use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
+
+/// Fullscreen strict-mode breathing-break takeover, synced to strict breaks
+/// (matches Electron's syncStrictWindow): shown while strict mode is on and a
+/// break phase is running; hidden otherwise.
+pub fn sync_strict(app: &AppHandle) {
+    let (strict, show) = {
+        let st = app.state::<AppState>();
+        let e = st.engine.lock().unwrap();
+        (
+            e.settings.strict_mode,
+            matches!(e.status, Status::Running) && matches!(e.phase, Phase::Short | Phase::Long),
+        )
+    };
+    if strict && show { show_strict(app); } else { hide_strict(app); }
+}
+
+fn show_strict(app: &AppHandle) {
+    let win = app.get_webview_window("strict").unwrap_or_else(|| {
+        WebviewWindowBuilder::new(app, "strict", WebviewUrl::App("strict.html".into()))
+            .decorations(false)
+            .always_on_top(true)
+            .skip_taskbar(true)
+            .maximized(true)
+            .build()
+            .expect("build strict")
+    });
+    let _ = win.set_fullscreen(true);
+    let _ = win.show();
+    let _ = win.set_focus();
+}
+fn hide_strict(app: &AppHandle) {
+    if let Some(w) = app.get_webview_window("strict") { let _ = w.hide(); }
+}
 
 pub fn show_main(app: &AppHandle) {
     if let Some(w) = app.get_webview_window("main") {
@@ -53,6 +88,7 @@ pub fn show_about(app: &AppHandle) {
 
 /// Show / hide the full-screen strict-focus blocker overlay (`blocked.html`).
 pub fn show_blocker(app: &AppHandle, site: &str) {
+    use tauri::Emitter;
     let url = format!("blocked.html?site={}", urlencoding(site));
     let win = app.get_webview_window("blocker").unwrap_or_else(|| {
         WebviewWindowBuilder::new(app, "blocker", WebviewUrl::App(url.into()))
@@ -63,6 +99,8 @@ pub fn show_blocker(app: &AppHandle, site: &str) {
             .build()
             .expect("build blocker")
     });
+    let _ = win.set_fullscreen(true);
+    let _ = win.emit("blocker-site", site); // update the site when already open
     let _ = win.show();
 }
 pub fn hide_blocker(app: &AppHandle) {

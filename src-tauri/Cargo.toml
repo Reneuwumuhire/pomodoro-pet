@@ -20,6 +20,8 @@ tauri-plugin-http = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tokio = { version = "1", features = ["time", "sync", "rt", "macros"] }
+chrono = "0.4"
+tauri-plugin-global-shortcut = "2"
 
 # Smaller release binaries (part of the 10–15 MB target).
 [profile.release]

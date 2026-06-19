@@ -38,6 +38,7 @@ pub fn maybe_sync(app: &AppHandle) {
             return;
         }
         if now_ms() < SNOOZE_UNTIL.load(Ordering::Relaxed) {
+            crate::windows::hide_blocker(app);
             return;
         }
         let det = detect_front();
