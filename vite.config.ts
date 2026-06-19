@@ -24,8 +24,7 @@ export default defineConfig({
         index: resolve('src/renderer/index.html'),
         mini: resolve('src/renderer/mini.html'),
         strict: resolve('src/renderer/strict.html'),
-        blocked: resolve('src/renderer/blocked.html'),
-        about: resolve('src/renderer/about.html')
+        blocked: resolve('src/renderer/blocked.html')
       }
     }
   }

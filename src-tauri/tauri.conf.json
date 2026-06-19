@@ -10,6 +10,7 @@
     "beforeBuildCommand": "pnpm build:web"
   },
   "app": {
+    "macOSPrivateApi": true,
     "withGlobalTauri": false,
     "security": {
       "csp": "default-src 'self'; img-src 'self' asset: http://asset.localhost data:; media-src 'self' asset: http://asset.localhost data:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost https://api.github.com",
@@ -25,12 +26,13 @@
         "width": 420,
         "height": 600,
         "resizable": false,
-        "decorations": false,
-        "transparent": true,
-        "alwaysOnTop": true,
-        "skipTaskbar": true,
+        "decorations": true,
+        "transparent": false,
+        "alwaysOnTop": false,
+        "skipTaskbar": false,
+        "center": true,
         "shadow": true,
-        "visible": false,
+        "visible": true,
         "url": "index.html"
       }
     ]

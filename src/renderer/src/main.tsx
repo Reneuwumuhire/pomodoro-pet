@@ -24,8 +24,18 @@ const mode =
   (window as unknown as { __MODE__?: 'full' | 'mini' | 'strict' | 'blocked' }).__MODE__ ??
   'full'
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <App mode={mode} />
-  </React.StrictMode>
-)
+async function boot(): Promise<void> {
+  // Electron sets `window.pomodoro` via its preload; under Tauri there's no preload,
+  // so install the Tauri-backed shim (invoke/listen) before anything reads the API.
+  if (!(window as unknown as { pomodoro?: unknown }).pomodoro) {
+    const { installTauriApi } = await import('./platform/tauri')
+    installTauriApi()
+  }
+  ReactDOM.createRoot(document.getElementById('root')!).render(
+    <React.StrictMode>
+      <App mode={mode} />
+    </React.StrictMode>
+  )
+}
+
+void boot()

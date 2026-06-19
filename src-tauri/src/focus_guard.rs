@@ -56,8 +56,8 @@ pub fn maybe_sync(app: &AppHandle) {
     }
 }
 
-#[tauri::command]
-pub async fn test_once(_app: &AppHandle) -> serde_json::Value {
+/// One-shot detection for the Settings "Test focus shield" button.
+pub fn test_once() -> serde_json::Value {
     #[cfg(target_os = "macos")]
     {
         let d = detect_front();
