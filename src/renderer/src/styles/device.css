@@ -390,7 +390,13 @@ input[type='range'] {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+  /* Pinned to the bottom of the scrolling panel so CANCEL/APPLY are always visible. */
+  position: sticky;
+  bottom: 0;
   margin-top: 18px;
+  padding: 11px 0 3px;
+  background: var(--panel-bg);
+  border-top: 1px solid color-mix(in srgb, var(--panel-ink, #1d1d1f) 9%, transparent);
 }
 .text-btn {
   padding: 8px 14px;
