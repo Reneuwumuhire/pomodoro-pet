@@ -4,6 +4,7 @@ import { registerIpc } from './ipc'
 import { createMainWindow, createTray, showBlockerWindow, showMini, toggleMini } from './windows'
 import { ensureMusicDir, registerMusicProtocol, registerMusicScheme } from './music'
 import { setupFocusGuard, stopGuard } from './focusGuard'
+import { setupAboutPanel } from './update'
 
 // Must run before app `ready`.
 registerMusicScheme()
@@ -23,6 +24,7 @@ if (!gotLock) {
 
     registerMusicProtocol()
     ensureMusicDir()
+    setupAboutPanel()
 
     engine = new TimerEngine()
     registerIpc(engine)

@@ -2,6 +2,7 @@ import { app, BrowserWindow, Menu, nativeImage, screen, Tray } from 'electron'
 import { writeFileSync } from 'fs'
 import { join } from 'path'
 import { TimerEngine } from './timer'
+import { checkForUpdatesInteractive } from './update'
 
 const isDev = !app.isPackaged
 
@@ -364,6 +365,9 @@ export function createTray(engine: TimerEngine): Tray {
           accelerator: 'CommandOrControl+Shift+M',
           click: () => toggleMini()
         },
+        { type: 'separator' },
+        { label: 'About Petomato', click: () => app.showAboutPanel() },
+        { label: 'Check for Updates…', click: () => void checkForUpdatesInteractive() },
         { type: 'separator' },
         { label: 'Quit', click: () => app.quit() }
       ])
