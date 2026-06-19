@@ -15,6 +15,7 @@ import {
 import { notifyPhase } from './notifications'
 import { audioLibrary, audioSlots, musicFolderInfo, openMusicFolder } from './music'
 import { snoozeGuard, testGuard } from './focusGuard'
+import { appMeta, checkForUpdate, openExternal } from './update'
 import {
   getSettings,
   getStats,
@@ -144,6 +145,11 @@ export function registerIpc(engine: TimerEngine): void {
   // distraction blocker overlay dismissed -> brief grace period
   ipcMain.on('blocker:snooze', () => snoozeGuard())
   ipcMain.handle('blocker:test', () => testGuard())
+
+  // about + updates
+  ipcMain.handle('app:meta', () => appMeta())
+  ipcMain.handle('app:checkUpdate', () => checkForUpdate())
+  ipcMain.on('app:openExternal', (_e, url: string) => openExternal(url))
 
   // pushes
   engine.onChange((state) => {

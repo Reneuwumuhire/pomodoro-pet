@@ -1,5 +1,14 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron'
-import type { ChimeRequest, PomodoroApi, Settings, Tag, Task, TimerState } from '../shared/types'
+import type {
+  AppMeta,
+  ChimeRequest,
+  PomodoroApi,
+  Settings,
+  Tag,
+  Task,
+  TimerState,
+  UpdateInfo
+} from '../shared/types'
 
 const api: PomodoroApi = {
   start: () => ipcRenderer.send('timer:start'),
@@ -26,6 +35,9 @@ const api: PomodoroApi = {
   showMain: () => ipcRenderer.send('win:showMain'),
   toggleMini: () => ipcRenderer.send('win:toggleMini'),
   hideMain: () => ipcRenderer.send('win:hide'),
+  getAppMeta: () => ipcRenderer.invoke('app:meta') as Promise<AppMeta>,
+  checkForUpdate: () => ipcRenderer.invoke('app:checkUpdate') as Promise<UpdateInfo>,
+  openExternal: (url: string) => ipcRenderer.send('app:openExternal', url),
 
   getAudioSlots: () => ipcRenderer.invoke('audio:slots') as Promise<Record<string, boolean>>,
   getMusicLibrary: () => ipcRenderer.invoke('audio:library') as Promise<string[]>,

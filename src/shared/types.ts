@@ -164,8 +164,30 @@ export interface PomodoroApi {
   snoozeBlocker(): void
   onBlockerSite(cb: (site: string) => void): () => void
   testBlocker(): Promise<{ app: string; title: string; url: string; error: string; blocked: string | null }>
+  // about + updates
+  getAppMeta(): Promise<AppMeta>
+  checkForUpdate(): Promise<UpdateInfo>
+  openExternal(url: string): void
   // subscriptions
   onState(cb: (state: TimerState) => void): () => void
   onChime(cb: (req: ChimeRequest) => void): () => void
   onTasks(cb: (tasks: Task[]) => void): () => void
+}
+
+export interface AppMeta {
+  name: string
+  version: string
+  author: string
+  authorUrl: string
+  repoUrl: string
+  siteUrl: string
+}
+
+export interface UpdateInfo {
+  current: string
+  latest: string | null
+  hasUpdate: boolean
+  releaseUrl: string
+  assetUrl: string
+  error?: string
 }

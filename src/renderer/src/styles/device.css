@@ -1216,3 +1216,22 @@ input[type='range'] {
   font-size: 11px;
   color: var(--panel-sub, #999);
 }
+
+/* ============================ About / updates ============================ */
+.about { display: flex; flex-direction: column; gap: 8px; }
+.about-head { display: flex; align-items: baseline; gap: 8px; }
+.about-name { font-weight: 700; font-size: 14px; color: var(--panel-ink); }
+.about-ver { font-size: 12px; color: var(--panel-sub); }
+.about-by { font-size: 12px; color: var(--panel-sub); }
+.about-links { display: flex; gap: 14px; margin-top: 2px; }
+.about .link {
+  color: var(--accent, #e8463a);
+  font: inherit;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent, #e8463a) 45%, transparent);
+}
+.about .link:hover { opacity: 0.8; }
+.about-update { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; font-size: 12px; }
+.about-update .ok { color: #2ea44f; font-weight: 600; }
+.about-update .up { color: var(--accent, #e8463a); font-weight: 700; }
+.about-update .muted { color: var(--panel-sub); }
+.folder-btn.primary { background: var(--accent, #e8463a); color: #fff; border-color: transparent; }
