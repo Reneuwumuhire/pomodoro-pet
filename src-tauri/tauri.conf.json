@@ -1,0 +1,70 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Petomato",
+  "version": "2.0.0",
+  "identifier": "com.rene.petomato",
+  "build": {
+    "frontendDist": "../dist-web",
+    "devUrl": "http://localhost:1420",
+    "beforeDevCommand": "pnpm dev:web",
+    "beforeBuildCommand": "pnpm build:web"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' asset: http://asset.localhost data:; media-src 'self' asset: http://asset.localhost data:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost https://api.github.com",
+      "assetProtocol": {
+        "enable": true,
+        "scope": ["$AUDIO/**", "$HOME/**"]
+      }
+    },
+    "windows": [
+      {
+        "label": "main",
+        "title": "Petomato",
+        "width": 420,
+        "height": 600,
+        "resizable": false,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "shadow": true,
+        "visible": false,
+        "url": "index.html"
+      }
+    ]
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["dmg", "app", "nsis", "msi"],
+    "category": "Productivity",
+    "copyright": "© Rene Uwumuhire",
+    "shortDescription": "A retro-LCD Pomodoro timer with a pixel pet that grows as you focus.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "13.0",
+      "dmg": { "appPosition": { "x": 180, "y": 170 }, "applicationFolderPosition": { "x": 480, "y": 170 } },
+      "entitlements": "Entitlements.plist",
+      "exceptionDomain": ""
+    },
+    "windows": {
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper",
+        "silent": true
+      },
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": ["English"]
+      },
+      "allowDowngrades": true
+    }
+  },
+  "plugins": {}
+}

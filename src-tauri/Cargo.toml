@@ -1,0 +1,35 @@
+[package]
+name = "petomato"
+version = "2.0.0"
+description = "A retro-LCD Pomodoro timer with a pixel pet that grows as you focus."
+authors = ["Rene Uwumuhire"]
+license = "MIT"
+edition = "2021"
+rust-version = "1.77"
+
+# The Tauri 2 library + binary split.
+[lib]
+name = "petomato_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
+tauri-plugin-store = "2"
+tauri-plugin-notification = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-opener = "2"
+tauri-plugin-http = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["time", "sync", "rt", "macros"] }
+
+# Smaller release binaries (part of the 10–15 MB target).
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
