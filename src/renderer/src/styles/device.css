@@ -1223,3 +1223,40 @@ input[type='range'] {
   font-size: 11px;
   color: var(--panel-sub, #999);
 }
+
+/* ============ Tauri (WKWebView) control parity ============
+   WebKit renders <input type=range> and <select> with native macOS chrome, unlike
+   Chromium (Electron). Restyle them to match the Electron look. Scoped to `.tauri`
+   (added by the Tauri shim) so the Electron build is untouched. */
+.tauri input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: #d6d6d8;
+  outline: none;
+}
+.tauri input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: #1d1d1f;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+.tauri select,
+.tauri .select {
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%23999' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+  padding-right: 26px;
+}
+.tauri input:focus,
+.tauri select:focus,
+.tauri textarea:focus,
+.tauri button:focus { outline: none; }

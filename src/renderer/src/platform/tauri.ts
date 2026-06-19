@@ -83,6 +83,10 @@ export const tauriApi: PomodoroApi = {
 export function installTauriApi(): void {
   ;(window as unknown as { pomodoro: PomodoroApi }).pomodoro = tauriApi
 
+  // Mark the document so CSS can fix WebKit-vs-Chromium control rendering
+  // (sliders, dropdowns) without affecting the Electron build.
+  document.documentElement.classList.add('tauri')
+
   // Custom music-folder playback: useAudio.ts uses this (when present) to turn a
   // folder song into an asset: URL, replacing Electron's pomo-audio:// protocol.
   ;(window as unknown as { __convertFileSrc?: (p: string) => string }).__convertFileSrc = convertFileSrc

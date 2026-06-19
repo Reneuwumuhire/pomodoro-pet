@@ -43,8 +43,11 @@ fn main() {
             let sep1 = PredefinedMenuItem::separator(app)?;
             let sep2 = PredefinedMenuItem::separator(app)?;
             let menu = Menu::with_items(app, &[&toggle, &reset, &skip, &sep1, &open, &mini, &sep2, &quit])?;
+            // Proper monochrome menu-bar template icon (not the colored app icon,
+            // which renders as a black blob when used as a template).
+            let tray_icon = tauri::image::Image::from_bytes(include_bytes!("../../resources/trayTemplate.png"))?;
             let _tray = TrayIconBuilder::with_id("tray")
-                .icon(app.default_window_icon().unwrap().clone())
+                .icon(tray_icon)
                 .icon_as_template(true)
                 .menu(&menu)
                 .show_menu_on_left_click(false)
