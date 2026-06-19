@@ -11,7 +11,6 @@ import { THEMES } from '@/themes'
 import { IconClose, IconShield } from '@/icons'
 import Pill from './Pill'
 import MusicFolder from './MusicFolder'
-import AboutSection from './AboutSection'
 
 interface Props {
   settings: Settings
@@ -234,9 +233,6 @@ export default function SettingsPanel({ settings, onApply, onClose }: Props): JS
             <Pill key={p.kind} label={p.label} active={d.pet === p.kind} onClick={() => set('pet', p.kind)} />
           ))}
         </div>
-
-        <div className="section">About</div>
-        <AboutSection />
 
         <div className="panel-actions">
           <button className="text-btn" onClick={onClose}>
