@@ -24,12 +24,11 @@ body {
   overflow: hidden;
 }
 
-/* The mini window is transparent so only the device shows. The padding is a
-   gutter so the card's rounded drop shadow renders inside the window instead of
-   being clipped at the edges (which looked like a hard square at the bottom). */
+/* The mini window is transparent so only the device shows. The card fills the
+   window edge-to-edge with rounded corners, so the native macOS window shadow
+   follows the rounded shape (no square artifact). */
 body.mini-body {
   background: transparent;
-  padding: 18px 25px 36px;
 }
 
 button {

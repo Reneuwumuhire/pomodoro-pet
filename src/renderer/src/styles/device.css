@@ -411,9 +411,9 @@ input[type='range'] {
   padding: 12px;
   border-radius: 20px;
   background: linear-gradient(180deg, var(--case-top), var(--case-bottom));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 10px 24px rgba(0, 0, 0, 0.3);
+  /* No CSS drop shadow — the card fills the window so the native macOS window
+     shadow follows the rounded corners (the CSS shadow got clipped into a square). */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
   display: flex;
   flex-direction: column;
   gap: 10px;

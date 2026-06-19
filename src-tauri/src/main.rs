@@ -45,7 +45,7 @@ fn main() {
             let menu = Menu::with_items(app, &[&toggle, &reset, &skip, &sep1, &open, &mini, &sep2, &quit])?;
             // Proper monochrome menu-bar template icon (not the colored app icon,
             // which renders as a black blob when used as a template).
-            let tray_icon = tauri::image::Image::from_bytes(include_bytes!("../../resources/trayTemplate.png"))?;
+            let tray_icon = tauri::image::Image::from_bytes(include_bytes!("../icons/trayTemplate.png"))?;
             let _tray = TrayIconBuilder::with_id("tray")
                 .icon(tray_icon)
                 .icon_as_template(true)
@@ -61,18 +61,8 @@ fn main() {
                     _ => {}
                 })
                 .on_tray_icon_event(|tray, event| {
-                    if let TrayIconEvent::Click { button: MouseButton::Left, button_state: MouseButtonState::Up, rect, .. } = event {
-                        use tauri::{Position, Size};
-                        let (px, py) = match rect.position {
-                            Position::Physical(p) => (p.x as f64, p.y as f64),
-                            Position::Logical(p) => (p.x, p.y),
-                        };
-                        let (sw, sh) = match rect.size {
-                            Size::Physical(s) => (s.width as f64, s.height as f64),
-                            Size::Logical(s) => (s.width, s.height),
-                        };
-                        // position the popover centered under the tray icon
-                        windows::toggle_main_at(tray.app_handle(), px + sw / 2.0, py + sh);
+                    if let TrayIconEvent::Click { button: MouseButton::Left, button_state: MouseButtonState::Up, .. } = event {
+                        windows::toggle_main(tray.app_handle()); // opens top-right
                     }
                 })
                 .build(app)?;
@@ -88,8 +78,8 @@ fn main() {
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
             if let Some(w) = app.get_webview_window("main") {
                 let _ = w.set_visible_on_all_workspaces(true);
-                let _ = w.center();
                 let _ = w.show();
+                windows::place_top_right(app.handle(), &w); // open top-right every time
                 let _ = w.set_focus();
                 let wc = w.clone();
                 w.on_window_event(move |ev| {

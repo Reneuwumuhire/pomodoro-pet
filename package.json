@@ -1,8 +1,7 @@
 {
   "name": "petomato",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A retro LCD Pomodoro timer with a pixel pet that grows while you focus.",
-  "main": "./out/main/index.js",
   "author": "Rene Uwumuhire (https://github.com/Reneuwumuhire)",
   "homepage": "https://reneuwumuhire.github.io/petomato/",
   "repository": "github:Reneuwumuhire/petomato",
@@ -10,21 +9,16 @@
   "type": "module",
   "packageManager": "pnpm@10.17.1",
   "scripts": {
-    "dev": "electron-vite dev",
-    "build": "electron-vite build",
-    "start": "electron-vite preview",
-    "dist": "electron-vite build && electron-builder --mac",
-    "dist:win": "electron-vite build && electron-builder --win",
-    "dist:dir": "electron-vite build && electron-builder --mac --dir",
-    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
+    "dev": "tauri dev",
+    "build": "tauri build",
     "dev:web": "vite",
     "build:web": "vite build",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "typecheck": "tsc --noEmit -p tsconfig.web.json"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.11.1",
     "@tauri-apps/plugin-dialog": "^2.7.1",
-    "electron-store": "^8.2.0",
     "react-icons": "^5.6.0",
     "zustand": "^4.5.5"
   },
@@ -34,9 +28,6 @@
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
-    "electron": "^33.3.0",
-    "electron-builder": "^25.1.8",
-    "electron-vite": "^2.3.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "typescript": "^5.7.2",
