@@ -32,11 +32,25 @@ fn show_strict(app: &AppHandle) {
             .decorations(false)
             .always_on_top(true)
             .skip_taskbar(true)
-            .maximized(true)
+            .visible(false)
             .build()
             .expect("build strict")
     });
-    let _ = win.set_fullscreen(true);
+    // sync_strict runs on every tick — only (re)show + focus on the transition to
+    // visible, otherwise it would steal focus continuously.
+    if win.is_visible().unwrap_or(false) {
+        return;
+    }
+    let _ = win.set_visible_on_all_workspaces(true);
+    // Cover the whole primary monitor — a reliable fullscreen takeover (native
+    // fullscreen is flaky for transparent/frameless windows). Only the "Skip break"
+    // button closes it (skip → broadcast → sync_strict → hide_strict).
+    if let Ok(Some(mon)) = app.primary_monitor() {
+        let p = mon.position();
+        let s = mon.size();
+        let _ = win.set_position(PhysicalPosition::new(p.x, p.y));
+        let _ = win.set_size(tauri::PhysicalSize::new(s.width, s.height));
+    }
     let _ = win.show();
     let _ = win.set_focus();
 }

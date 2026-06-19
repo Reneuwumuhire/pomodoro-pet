@@ -136,6 +136,9 @@ pub struct AppState {
 pub fn broadcast(app: &AppHandle) {
     let snap = app.state::<AppState>().engine.lock().unwrap().snapshot();
     update_tray_title(app, &snap);
+    // Keep the strict-break overlay in sync on EVERY state change (incl. skip),
+    // so skipping the break actually closes it.
+    crate::windows::sync_strict(app);
     let _ = app.emit("timer-state", snap);
 }
 
