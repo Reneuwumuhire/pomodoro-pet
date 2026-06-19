@@ -81,17 +81,37 @@ pub fn show_mini(app: &AppHandle) {
     let win = app.get_webview_window("mini").unwrap_or_else(|| {
         WebviewWindowBuilder::new(app, "mini", WebviewUrl::App("mini.html".into()))
             .title("Petomato — Mini")
-            .inner_size(280.0, 248.0)
+            // sized to fit the card (280x246) + a transparent gutter for its rounded
+            // drop shadow; native window shadow OFF so there's no square artifact.
+            .inner_size(330.0, 300.0)
             .resizable(false)
             .decorations(false)
             .transparent(true)
+            .shadow(false)
             .always_on_top(true)
             .skip_taskbar(true)
             .build()
             .expect("build mini")
     });
+    let _ = win.set_visible_on_all_workspaces(true);
+    // Always (re)open top-right; the user can then drag it wherever.
+    position_mini_top_right(app, &win);
     let _ = win.show();
     let _ = win.set_focus();
+}
+
+fn position_mini_top_right(app: &AppHandle, win: &tauri::WebviewWindow) {
+    if let Ok(Some(mon)) = app.primary_monitor() {
+        let scale = mon.scale_factor();
+        let mpos = mon.position();
+        let msize = mon.size();
+        let margin = (12.0 * scale) as i32;
+        let below_menubar = (36.0 * scale) as i32;
+        let w = win.outer_size().map(|s| s.width as i32).unwrap_or((330.0 * scale) as i32);
+        let x = mpos.x + msize.width as i32 - w - margin;
+        let y = mpos.y + below_menubar;
+        let _ = win.set_position(PhysicalPosition::new(x, y));
+    }
 }
 
 pub fn toggle_mini(app: &AppHandle) {
