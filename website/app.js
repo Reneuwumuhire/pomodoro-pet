@@ -141,17 +141,26 @@ document.querySelectorAll('section > .band-head, .hero-copy, .hero-device, .feat
 // release is published, or drop the built files next to this page).
 const RELEASES = 'https://github.com/Reneuwumuhire/petomato/releases'
 const DOWNLOADS = {
-  mac: {
+  macUniversal: {
     os: 'macOS',
+    label: 'macOS · Universal',
     file: RELEASES,
-    short: 'Apple Silicon & Intel',
-    note: 'macOS 13+ (Apple Silicon & Intel) · unsigned build — right-click the app → Open the first time.'
+    short: 'Intel & Apple Silicon',
+    note: 'macOS 13+ (Intel & Apple Silicon) · unsigned — right-click the app → Open the first time.'
+  },
+  macArm: {
+    os: 'macOS',
+    label: 'macOS · Apple Silicon',
+    file: RELEASES,
+    short: 'Apple Silicon (smaller)',
+    note: 'macOS 13+ Apple Silicon · unsigned — right-click the app → Open the first time.'
   },
   win: {
     os: 'Windows',
+    label: 'Windows',
     file: RELEASES,
     short: 'Windows 10/11',
-    note: 'Windows 10/11 · unsigned installer — if SmartScreen warns, choose “More info → Run anyway”.'
+    note: 'Windows 10/11 (x64) · unsigned installer — if SmartScreen warns: “More info → Run anyway”.'
   }
 }
 
@@ -166,10 +175,14 @@ function detectOS() {
 
 function applyDownloads() {
   const os = detectOS()
-  const primaryKey = os === 'win' ? 'win' : 'mac' // default unknown/Linux to mac
-  const otherKey = primaryKey === 'mac' ? 'win' : 'mac'
-  const main = DOWNLOADS[primaryKey]
-  const other = DOWNLOADS[otherKey]
+  // mac users default to the Universal build; the Apple-Silicon-only build is the
+  // smaller option. Windows users get the Windows installer first.
+  const order =
+    os === 'win'
+      ? ['win', 'macUniversal', 'macArm']
+      : ['macUniversal', 'macArm', 'win']
+  const main = DOWNLOADS[order[0]]
+  const other = DOWNLOADS[os === 'win' ? 'macUniversal' : 'win']
 
   const set = (id, fn) => { const el = document.getElementById(id); if (el) fn(el) }
 
@@ -178,19 +191,19 @@ function applyDownloads() {
   set('dl-note-top', (el) => { el.textContent = `Free · ${main.short} · also on ${other.os}` })
   set('dl-alt', (el) => { el.textContent = `Or download for ${other.os}`; el.href = other.file })
 
-  // bottom: a button per platform, the detected one first/emphasized
+  // bottom: a pill per build, the most relevant first/emphasized
   set('dl-btn', (el) => { el.textContent = `Download for ${main.os}`; el.href = main.file })
   set('dl-note', (el) => { el.textContent = main.note })
   set('dl-row', (el) => {
     el.innerHTML = ''
-    for (const key of [primaryKey, otherKey]) {
+    order.forEach((key, i) => {
       const d = DOWNLOADS[key]
       const a = document.createElement('a')
       a.href = d.file
-      a.className = 'dl-pill' + (key === primaryKey ? ' on' : '')
-      a.textContent = d.os
+      a.className = 'dl-pill' + (i === 0 ? ' on' : '')
+      a.textContent = d.label
       el.appendChild(a)
-    }
+    })
   })
 }
 applyDownloads() // initial: links fall back to the Releases page
@@ -207,11 +220,13 @@ fetch('https://api.github.com/repos/Reneuwumuhire/petomato/releases', { cache: '
         const a = (rel.assets || []).find((x) => re.test(x.name))
         return a && a.browser_download_url
       }
-      const mac = url(/\.dmg$/i)
-      const win = url(/\.exe$/i)
-      if (mac) DOWNLOADS.mac.file = mac
+      const uni = url(/universal\.dmg$/i) || url(/\.dmg$/i)
+      const arm = url(/aarch64\.dmg$/i) || url(/arm64\.dmg$/i)
+      const win = url(/x64.*setup\.exe$/i) || url(/x64.*\.exe$/i) || url(/setup\.exe$/i) || url(/\.exe$/i)
+      if (uni) DOWNLOADS.macUniversal.file = uni
+      if (arm) DOWNLOADS.macArm.file = arm
       if (win) DOWNLOADS.win.file = win
-      if (mac || win) applyDownloads()
+      if (uni || arm || win) applyDownloads()
     }
     const total = rels.reduce(
       (sum, r) => sum + (r.assets || []).reduce((s, a) => s + (a.download_count || 0), 0),
