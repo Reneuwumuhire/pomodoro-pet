@@ -1,41 +1,35 @@
-name: tauri-release
+name: tauri-windows
 
-# Builds Petomato (Tauri) for macOS Universal + Windows x64/ARM64 and attaches the
-# installers to a draft GitHub Release.
+# Builds the Windows installers (x64 + ARM64) on real Windows runners and uploads
+# them as workflow artifacts. They're then attached to the release manually
+# (`gh release upload`) so the published release notes/assets aren't clobbered.
 #
-# Manual-only for now (workflow_dispatch) so it does NOT clash with the live Electron
-# `build-release.yml` on v* tags. AT CUTOVER: delete build-release.yml and switch this to
-#   on: { push: { tags: ['v*'] } }
+# Run:  gh workflow run tauri-windows --ref main -f ref=v2.0.0
 on:
   workflow_dispatch:
+    inputs:
+      ref:
+        description: 'git ref (tag/branch) to build'
+        default: v2.0.0
+        required: true
 
 jobs:
-  build:
+  windows:
     permissions:
-      contents: write
+      contents: read
     strategy:
       fail-fast: false
       matrix:
         include:
-          # macOS Universal (Intel + Apple Silicon) — runs on Apple Silicon runner
-          - host: macos-14
-            target: universal-apple-darwin
-            rust-targets: aarch64-apple-darwin,x86_64-apple-darwin
-            args: --target universal-apple-darwin
-          # Windows 64-bit
           - host: windows-latest
             target: x86_64-pc-windows-msvc
-            rust-targets: x86_64-pc-windows-msvc
-            args: --target x86_64-pc-windows-msvc
-          # Windows on ARM (modern ARM64 laptops)
           - host: windows-11-arm
             target: aarch64-pc-windows-msvc
-            rust-targets: aarch64-pc-windows-msvc
-            args: --target aarch64-pc-windows-msvc
-
     runs-on: ${{ matrix.host }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
 
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
@@ -43,32 +37,23 @@ jobs:
           node-version: 20
           cache: pnpm
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.rust-targets }}
+          targets: ${{ matrix.target }}
 
-      - name: Cache cargo
-        uses: swatinem/rust-cache@v2
+      - uses: swatinem/rust-cache@v2
         with:
           workspaces: src-tauri
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Build + release (Tauri)
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # macOS signing/notarization (optional — set these secrets to enable):
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      - name: Build Windows bundle
+        run: pnpm tauri build --target ${{ matrix.target }}
+
+      - uses: actions/upload-artifact@v4
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: 'Petomato ${{ github.ref_name }}'
-          releaseDraft: true
-          args: ${{ matrix.args }}
-          # produces: src-tauri/target/<triple>/release/bundle/{dmg,nsis,msi}/
+          name: petomato-windows-${{ matrix.target }}
+          if-no-files-found: error
+          path: |
+            src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*-setup.exe
+            src-tauri/target/${{ matrix.target }}/release/bundle/msi/*.msi
