@@ -9,10 +9,10 @@
  *
  * Install once at startup:  `import { installTauriApi } from './platform/tauri'; installTauriApi()`
  */
-import { invoke } from '@tauri-apps/api/core'
+import { invoke, convertFileSrc } from '@tauri-apps/api/core'
 import { listen, type UnlistenFn } from '@tauri-apps/api/event'
+import { getCurrentWindow } from '@tauri-apps/api/window'
 import { open } from '@tauri-apps/plugin-dialog'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import type { ChimeRequest, PomodoroApi, Settings, Tag, Task, TimerState } from '@shared/types'
 
 /** Bridge a Tauri event to the `onX(cb) => unsubscribe` callback style the UI expects. */
@@ -54,10 +54,16 @@ export const tauriApi: PomodoroApi = {
   getMusicFolderInfo: () => invoke('audio_folder_info'),
   openMusicFolder: () => void invoke('audio_open_folder'),
   setMusicFolder: (path: string) => invoke<TimerState>('audio_set_folder', { path }),
-  // native folder picker via the dialog plugin (replaces Electron dialog.showOpenDialog)
+  // native folder picker via the dialog plugin (replaces Electron dialog.showOpenDialog).
+  // Pin the popover so its hide-on-blur doesn't dismiss it while the picker is open.
   pickMusicFolder: async () => {
-    const dir = await open({ directory: true, multiple: false, title: 'Choose your music folder' })
-    return dir ? invoke<TimerState>('audio_set_folder', { path: dir as string }) : null
+    await invoke('win_set_pinned', { pinned: true })
+    try {
+      const dir = await open({ directory: true, multiple: false, title: 'Choose your music folder' })
+      return dir ? await invoke<TimerState>('audio_set_folder', { path: dir as string }) : null
+    } finally {
+      await invoke('win_set_pinned', { pinned: false })
+    }
   },
   // drag-drop: convert an absolute path to an asset: URL the <audio> element can load
   getPathForFile: (file: File) => convertFileSrc((file as unknown as { path: string }).path),
@@ -76,4 +82,20 @@ export const tauriApi: PomodoroApi = {
 /** Expose it as `window.pomodoro` so every existing component keeps working unchanged. */
 export function installTauriApi(): void {
   ;(window as unknown as { pomodoro: PomodoroApi }).pomodoro = tauriApi
+
+  // Custom music-folder playback: useAudio.ts uses this (when present) to turn a
+  // folder song into an asset: URL, replacing Electron's pomo-audio:// protocol.
+  ;(window as unknown as { __convertFileSrc?: (p: string) => string }).__convertFileSrc = convertFileSrc
+
+  // Window dragging — Electron used CSS `-webkit-app-region: drag`, which WKWebView
+  // ignores. Replicate: drag the window from non-interactive areas of the card.
+  const NO_DRAG =
+    'button, input, select, textarea, a, canvas, .panel, .panel-backdrop, .task-main, ' +
+    '.active-task, .tool, .toolbar-pill, .chip, .now-playing, .mini-win, [data-no-drag]'
+  window.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return
+    const target = e.target as HTMLElement | null
+    if (!target || target.closest(NO_DRAG)) return
+    void getCurrentWindow().startDragging()
+  })
 }

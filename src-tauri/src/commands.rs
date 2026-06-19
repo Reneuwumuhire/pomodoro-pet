@@ -123,6 +123,8 @@ pub fn win_show_mini(app: AppHandle) { crate::windows::show_mini(&app); }
 pub fn win_toggle_mini(app: AppHandle) { crate::windows::toggle_mini(&app); }
 #[tauri::command]
 pub fn win_hide(app: AppHandle) { if let Some(w) = app.get_webview_window("main") { let _ = w.hide(); } }
+#[tauri::command]
+pub fn win_set_pinned(pinned: bool) { crate::windows::set_pinned(pinned); }
 
 // ── Audio / music folder ─────────────────────────────────────────────────────
 const AUDIO_EXT: [&str; 4] = ["mp3", "m4a", "wav", "ogg"];

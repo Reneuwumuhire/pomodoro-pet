@@ -29,7 +29,14 @@ const AMBIENT_FILE: Record<string, string> = {
   brown: 'ocean.mp3',
   cafe: 'cafe.mp3'
 }
-const trackUrl = (file: string): string => `pomo-audio://local/${encodeURIComponent(file)}`
+// Folder a custom song lives in (from settings.musicFolder). The Tauri build uses it
+// to build an asset: URL; Electron ignores it and uses the pomo-audio:// protocol.
+let currentMusicDir = ''
+const trackUrl = (file: string): string => {
+  const conv = (window as unknown as { __convertFileSrc?: (p: string) => string }).__convertFileSrc
+  if (conv && currentMusicDir) return conv(`${currentMusicDir}/${file}`)
+  return `pomo-audio://local/${encodeURIComponent(file)}`
+}
 
 function ambientUrl(slot: string, slots: Record<string, boolean>): string {
   if (slots[slot]) return trackUrl(AMBIENT_FILE[slot])
@@ -104,6 +111,7 @@ export function useAudio(): void {
   // reload the playlist immediately when the music folder changes
   const musicFolder = state?.settings.musicFolder
   useEffect(() => {
+    currentMusicDir = musicFolder ?? ''
     window.pomodoro
       .getMusicLibrary()
       .then((lib) => {

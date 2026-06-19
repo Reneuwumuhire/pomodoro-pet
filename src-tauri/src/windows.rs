@@ -3,7 +3,31 @@
 //! rule" (main and mini never both shown) is enforced here.
 use crate::model::{Phase, Status};
 use crate::timer::AppState;
-use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
+use std::sync::atomic::{AtomicBool, Ordering};
+use tauri::{AppHandle, Manager, PhysicalPosition, WebviewUrl, WebviewWindowBuilder};
+
+/// When pinned (e.g. a native folder picker is open), the popover won't hide-on-blur.
+static POPOVER_PINNED: AtomicBool = AtomicBool::new(false);
+pub fn set_pinned(v: bool) { POPOVER_PINNED.store(v, Ordering::Relaxed); }
+pub fn is_pinned() -> bool { POPOVER_PINNED.load(Ordering::Relaxed) }
+
+/// Toggle the main popover, positioning it centered just below the tray icon
+/// (menu-bar popover behaviour). Coords are physical pixels from the tray rect.
+pub fn toggle_main_at(app: &AppHandle, tray_center_x: f64, tray_bottom_y: f64) {
+    if let Some(w) = app.get_webview_window("main") {
+        if w.is_visible().unwrap_or(false) {
+            let _ = w.hide();
+            return;
+        }
+        if let Ok(size) = w.outer_size() {
+            let x = (tray_center_x - size.width as f64 / 2.0).max(8.0);
+            let _ = w.set_position(PhysicalPosition::new(x, tray_bottom_y + 2.0));
+        }
+        let _ = w.show();
+        let _ = w.set_focus();
+    }
+    if let Some(m) = app.get_webview_window("mini") { let _ = m.hide(); }
+}
 
 /// Fullscreen strict-mode breathing-break takeover, synced to strict breaks
 /// (matches Electron's syncStrictWindow): shown while strict mode is on and a
