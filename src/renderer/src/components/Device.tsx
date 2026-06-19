@@ -29,31 +29,31 @@ export default function Device(): JSX.Element {
 
   return (
     <div className="device-wrap">
-      <div className="device-shell">
-        <div className="toolbar">
-          <div className="toolbar-pill">
-            <button className="tool" onClick={() => setPanel('tasks')} title="Tasks">
-              <IconTasks size={17} />
-            </button>
-            <button className="tool" onClick={() => setPanel('stats')} title="Statistics">
-              <IconStats size={17} />
-            </button>
-            <button className="tool" onClick={skip} title="Skip phase">
-              <IconSkip size={17} />
-            </button>
-            <button className="tool" onClick={() => window.pomodoro.showMini()} title="Mini widget">
-              <IconMini size={17} />
-            </button>
-            <button className="tool" onClick={() => setPanel('settings')} title="Settings">
-              <IconSettings size={17} />
-            </button>
-            <span className="tool-divider" />
-            <button className="tool" onClick={() => window.pomodoro.hideMain()} title="Close">
-              <IconClose size={16} />
-            </button>
-          </div>
+      <div className="toolbar">
+        <div className="toolbar-pill">
+          <button className="tool" onClick={() => setPanel('tasks')} title="Tasks">
+            <IconTasks size={17} />
+          </button>
+          <button className="tool" onClick={() => setPanel('stats')} title="Statistics">
+            <IconStats size={17} />
+          </button>
+          <button className="tool" onClick={skip} title="Skip phase">
+            <IconSkip size={17} />
+          </button>
+          <button className="tool" onClick={() => window.pomodoro.showMini()} title="Mini widget">
+            <IconMini size={17} />
+          </button>
+          <button className="tool" onClick={() => setPanel('settings')} title="Settings">
+            <IconSettings size={17} />
+          </button>
+          <span className="tool-divider" />
+          <button className="tool" onClick={() => window.pomodoro.hideMain()} title="Close">
+            <IconClose size={16} />
+          </button>
         </div>
+      </div>
 
+      <div className="device-shell">
         <div className="device">
           <LcdScreen state={state} petBox={104} />
           <Controls status={state.status} onToggle={toggle} onReset={reset} />
