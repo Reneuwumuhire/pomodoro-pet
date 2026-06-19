@@ -98,6 +98,10 @@ export function installTauriApi(): void {
     '.active-task, .tool, .toolbar-pill, .chip, .now-playing, .mini-win, [data-no-drag]'
   window.addEventListener('mousedown', (e) => {
     if (e.button !== 0) return
+    // Only the main popover + mini are draggable — never the fullscreen strict
+    // break / blocker overlays.
+    const b = document.body.classList
+    if (!b.contains('panel-body') && !b.contains('mini-body')) return
     const target = e.target as HTMLElement | null
     if (!target || target.closest(NO_DRAG)) return
     void getCurrentWindow().startDragging()

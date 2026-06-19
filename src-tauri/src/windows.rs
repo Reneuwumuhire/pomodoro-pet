@@ -53,7 +53,26 @@ fn show_strict(app: &AppHandle) {
     }
     let _ = win.show();
     let _ = win.set_focus();
+    raise_above_everything(&win); // float above the menu bar + fullscreen apps
 }
+
+/// Put a window above EVERYTHING on macOS — screen-saver level + join-all-spaces,
+/// so the strict break covers the menu bar and overlays fullscreen apps.
+#[cfg(target_os = "macos")]
+fn raise_above_everything(win: &tauri::WebviewWindow) {
+    use objc2::{msg_send, runtime::AnyObject};
+    if let Ok(ptr) = win.ns_window() {
+        let ns = ptr as *mut AnyObject;
+        // NSScreenSaverWindowLevel = 1000; collectionBehavior = CanJoinAllSpaces (1)
+        // | FullScreenAuxiliary (1<<8).
+        unsafe {
+            let _: () = msg_send![ns, setLevel: 1000isize];
+            let _: () = msg_send![ns, setCollectionBehavior: 1usize | (1usize << 8)];
+        }
+    }
+}
+#[cfg(not(target_os = "macos"))]
+fn raise_above_everything(_win: &tauri::WebviewWindow) {}
 fn hide_strict(app: &AppHandle) {
     if let Some(w) = app.get_webview_window("strict") { let _ = w.hide(); }
 }
@@ -128,12 +147,25 @@ pub fn toggle_mini(app: &AppHandle) {
 }
 
 pub fn show_about(app: &AppHandle) {
-    if let Some(w) = app.get_webview_window("about") { let _ = w.show(); let _ = w.set_focus(); return; }
-    let _ = WebviewWindowBuilder::new(app, "about", WebviewUrl::App("about.html".into()))
+    if let Some(w) = app.get_webview_window("about") {
+        let _ = w.center();
+        let _ = w.show();
+        let _ = w.set_focus();
+        return;
+    }
+    let win = WebviewWindowBuilder::new(app, "about", WebviewUrl::App("about.html".into()))
         .title("About Petomato")
-        .inner_size(360.0, 480.0)
+        .inner_size(380.0, 500.0)
         .resizable(false)
-        .build();
+        .minimizable(false)
+        .maximizable(false)
+        .decorations(false)
+        .transparent(true)
+        .center()
+        .build()
+        .expect("build about");
+    let _ = win.show();
+    let _ = win.set_focus();
 }
 
 /// Show / hide the full-screen strict-focus blocker overlay (`blocked.html`).

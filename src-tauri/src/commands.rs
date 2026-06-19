@@ -185,6 +185,28 @@ pub fn audio_set_folder(path: String, state: State<AppState>, app: AppHandle) ->
     snap
 }
 
+// ── About / updates ──────────────────────────────────────────────────────────
+#[tauri::command]
+pub fn app_meta(app: AppHandle) -> Value {
+    json!({
+        "name": "Petomato",
+        "version": app.package_info().version.to_string(),
+        "author": "Rene Uwumuhire",
+        "authorUrl": "https://github.com/Reneuwumuhire",
+        "repoUrl": "https://github.com/Reneuwumuhire/petomato",
+        "siteUrl": "https://reneuwumuhire.github.io/petomato/",
+        "description": "A retro-LCD Pomodoro timer with a pixel pet that grows as you focus."
+    })
+}
+
+#[tauri::command]
+pub fn open_external(app: AppHandle, url: String) {
+    if url.starts_with("https://") || url.starts_with("http://") {
+        use tauri_plugin_opener::OpenerExt;
+        let _ = app.opener().open_url(url, None::<&str>);
+    }
+}
+
 // ── Focus shield ─────────────────────────────────────────────────────────────
 #[tauri::command]
 pub fn blocker_snooze(app: AppHandle) {

@@ -2571,6 +2571,7 @@ name = "petomato"
 version = "2.0.1"
 dependencies = [
  "chrono",
+ "objc2",
  "serde",
  "serde_json",
  "tauri",

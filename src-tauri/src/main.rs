@@ -39,10 +39,11 @@ fn main() {
             let skip = MenuItem::with_id(app, "skip", "Skip", true, None::<&str>)?;
             let open = MenuItem::with_id(app, "show", "Open Petomato", true, None::<&str>)?;
             let mini = MenuItem::with_id(app, "mini", "Toggle Mini Widget", true, Some("Cmd+Shift+M"))?;
+            let about = MenuItem::with_id(app, "about", "About Petomato", true, None::<&str>)?;
             let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
             let sep1 = PredefinedMenuItem::separator(app)?;
             let sep2 = PredefinedMenuItem::separator(app)?;
-            let menu = Menu::with_items(app, &[&toggle, &reset, &skip, &sep1, &open, &mini, &sep2, &quit])?;
+            let menu = Menu::with_items(app, &[&toggle, &reset, &skip, &sep1, &open, &mini, &about, &sep2, &quit])?;
             // Proper monochrome menu-bar template icon (not the colored app icon,
             // which renders as a black blob when used as a template).
             let tray_icon = tauri::image::Image::from_bytes(include_bytes!("../icons/trayTemplate.png"))?;
@@ -57,6 +58,7 @@ fn main() {
                     "skip" => { app.state::<AppState>().engine.lock().unwrap().advance(false); broadcast(app); }
                     "show" => windows::show_main(app),
                     "mini" => windows::toggle_mini(app),
+                    "about" => windows::show_about(app),
                     "quit" => app.exit(0),
                     _ => {}
                 })
@@ -121,6 +123,8 @@ fn main() {
             commands::audio_set_folder,
             commands::blocker_snooze,
             commands::blocker_test,
+            commands::app_meta,
+            commands::open_external,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Petomato");
