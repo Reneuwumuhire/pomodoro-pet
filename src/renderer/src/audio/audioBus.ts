@@ -11,6 +11,30 @@ const connected = new WeakSet<HTMLMediaElement>()
 // ignores the element's own volume/muted (Chromium honoured it, so Electron worked).
 const gains = new WeakMap<HTMLMediaElement, GainNode>()
 
+/** Resume the AudioContext if it's not running. WebKit (Tauri's WebView) keeps it
+ *  `suspended` until a user gesture and can move it to `interrupted` mid-session
+ *  (e.g. when the popover hides / system audio changes) — that's the "no sound
+ *  until I reopen the app" bug. We resume on every gesture + when the window
+ *  becomes visible, so it self-heals. The per-tick useAudio effect then replays
+ *  any element that got paused. */
+function kick(): void {
+  if (ctx && ctx.state !== 'running') void ctx.resume().catch(() => {})
+}
+
+let recoveryInstalled = false
+function installRecovery(): void {
+  if (recoveryInstalled) return
+  recoveryInstalled = true
+  // capture phase so the resume happens inside the user gesture (autoplay policy)
+  document.addEventListener('pointerdown', kick, true)
+  document.addEventListener('keydown', kick, true)
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) kick()
+  })
+  window.addEventListener('focus', kick)
+  ctx?.addEventListener('statechange', kick)
+}
+
 function ensure(): AnalyserNode {
   if (!ctx) {
     ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
@@ -19,6 +43,7 @@ function ensure(): AnalyserNode {
     analyser.smoothingTimeConstant = 0.8
     analyser.connect(ctx.destination)
     freq = new Uint8Array(new ArrayBuffer(analyser.frequencyBinCount))
+    installRecovery()
   }
   return analyser!
 }
