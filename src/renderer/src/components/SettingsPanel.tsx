@@ -90,7 +90,12 @@ export default function SettingsPanel({ settings, onApply, onClose }: Props): JS
 
   const apply = (): void => {
     appliedRef.current = true
-    onApply({ ...d, blockList: parseBlocklist(blockText) })
+    // `musicFolder` is owned by <MusicFolder/>, which commits the chosen folder
+    // live (the draft `d` still holds the stale value from when the panel opened).
+    // Omit it so APPLY merges the other settings without clobbering the folder back
+    // to empty — which was removing the songs and falling back to bundled music.
+    const { musicFolder: _ownedByPicker, ...rest } = d
+    onApply({ ...rest, blockList: parseBlocklist(blockText) })
     onClose()
   }
 
