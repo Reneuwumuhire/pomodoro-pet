@@ -29,6 +29,11 @@ fn main() {
             // load persisted state, seed the engine, register shared state
             let h = app.handle();
             let settings = store::load_settings(h);
+            // Re-grant the saved music folder to the asset: scope on every launch
+            // (the runtime scope isn't persisted), so a folder anywhere on disk plays.
+            if !settings.music_folder.is_empty() {
+                let _ = app.asset_protocol_scope().allow_directory(&settings.music_folder, true);
+            }
             let mut engine = TimerEngine::new(settings, store::completed_today(h));
             engine.active_task_id = store::load_active_task(h);
             app.manage(AppState { engine: Mutex::new(engine) });

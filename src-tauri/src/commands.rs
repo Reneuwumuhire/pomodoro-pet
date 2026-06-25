@@ -179,6 +179,13 @@ pub fn audio_set_folder(path: String, state: State<AppState>, app: AppHandle) ->
     } else {
         Path::new(&path).parent().map(|p| p.to_string_lossy().to_string()).unwrap_or_default()
     };
+    // Let the asset: protocol actually serve files from this folder, wherever it
+    // lives on disk. The static scope only covers $HOME/$AUDIO, so a folder on an
+    // external drive (e.g. /Volumes/...) would otherwise be blocked and songs would
+    // silently fail to play. Grant it (recursively) at runtime.
+    if !folder.is_empty() {
+        let _ = app.asset_protocol_scope().allow_directory(&folder, true);
+    }
     let snap = { let mut e = state.engine.lock().unwrap(); e.settings.music_folder = folder; e.snapshot() };
     store::save_settings(&app, &snap.settings);
     broadcast(&app);

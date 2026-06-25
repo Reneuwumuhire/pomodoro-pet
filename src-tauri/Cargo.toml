@@ -1,6 +1,6 @@
 [package]
 name = "petomato"
-version = "2.0.2"
+version = "2.0.3"
 description = "A retro-LCD Pomodoro timer with a pixel pet that grows as you focus."
 authors = ["Rene Uwumuhire"]
 license = "MIT"
