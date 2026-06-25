@@ -86,7 +86,10 @@ fn main() {
                 let wc = w.clone();
                 w.on_window_event(move |ev| {
                     if let tauri::WindowEvent::Focused(false) = ev {
-                        if !windows::is_pinned() {
+                        // Hide-on-blur only for a genuine click-away — never when our
+                        // own fullscreen overlay (strict break / blocker) stole focus,
+                        // or the popover would vanish for good once the overlay closes.
+                        if !windows::is_pinned() && !windows::overlay_active(wc.app_handle()) {
                             let _ = wc.hide();
                         }
                     }
@@ -126,6 +129,17 @@ fn main() {
             commands::app_meta,
             commands::open_external,
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running Petomato");
+        .build(tauri::generate_context!())
+        .expect("error while building Petomato")
+        .run(|_app, event| {
+            // Menu-bar app: hiding the last window must not quit the process. Tauri
+            // would otherwise exit when no windows remain. A window-close ExitRequest
+            // carries `code: None`; an explicit `app.exit(n)` (tray "Quit") carries
+            // `Some(n)` — only block the former so Quit still works.
+            if let tauri::RunEvent::ExitRequested { code, api, .. } = event {
+                if code.is_none() {
+                    api.prevent_exit();
+                }
+            }
+        });
 }

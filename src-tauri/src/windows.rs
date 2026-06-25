@@ -81,6 +81,20 @@ fn hide_strict(app: &AppHandle) {
     if let Some(w) = app.get_webview_window("strict") { let _ = w.hide(); }
 }
 
+/// True while a focus-stealing fullscreen overlay (strict break or site blocker)
+/// is on screen. The menu-bar popover must NOT hide-on-blur in that case: the
+/// overlay calls `set_focus()`, which blurs `main`; if we hid it, the popover would
+/// be gone for good once the overlay closes — the "app closes when a session
+/// completes" bug. Leaving `main` visible (behind the overlay) means it simply
+/// reappears when the break/blocker ends.
+pub fn overlay_active(app: &AppHandle) -> bool {
+    ["strict", "blocker"].iter().any(|id| {
+        app.get_webview_window(id)
+            .and_then(|w| w.is_visible().ok())
+            .unwrap_or(false)
+    })
+}
+
 pub fn show_main(app: &AppHandle) {
     if let Some(w) = app.get_webview_window("main") {
         let _ = w.show();
