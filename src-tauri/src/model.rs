@@ -96,3 +96,45 @@ pub struct TimerState {
     pub settings: Settings,
     pub active_task_id: Option<String>,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Simulates installing a build that added fields (`ambient`, `musicFolder`) over
+    /// a settings file saved by an older version that lacked them: existing values must
+    /// survive, the new fields fall back to defaults — never a full reset.
+    #[test]
+    fn old_settings_file_survives_added_fields() {
+        let old = r#"{
+            "focusMin": 42, "shortMin": 5, "longMin": 15, "longBreakAfter": 4,
+            "sessionGoal": 7, "pet": "fox", "theme": "amber", "volume": 0.3,
+            "muted": true, "autoStartBreak": false, "autoStartWork": true,
+            "strictMode": true, "muteNotificationsDuringFocus": true,
+            "focusMusic": "lofi2", "breakMusic": "lofi4", "musicVolume": 0.9,
+            "ambientVolume": 0.1, "blockList": ["x.com"]
+        }"#;
+        let s: Settings = serde_json::from_str(old).expect("old file must still parse");
+        // preserved
+        assert_eq!(s.focus_min, 42);
+        assert_eq!(s.session_goal, 7);
+        assert_eq!(s.theme, "amber");
+        assert!(s.muted);
+        assert_eq!(s.block_list, vec!["x.com".to_string()]);
+        // fields absent from the old file → defaults, not a wipe
+        assert_eq!(s.ambient, "none");
+        assert_eq!(s.music_folder, "");
+    }
+
+    /// A task saved before a field existed still loads, keeping its data.
+    #[test]
+    fn old_task_survives_added_fields() {
+        let old = r#"{ "id": "t1", "title": "Write", "tag": "work", "minutes": 25,
+            "estPomodoros": 3, "donePomodoros": 1 }"#;
+        let t: Task = serde_json::from_str(old).expect("old task must still parse");
+        assert_eq!(t.title, "Write");
+        assert_eq!(t.done_pomodoros, 1);
+        assert!(!t.completed); // missing → default
+        assert_eq!(t.order, 0); // missing → default
+    }
+}
