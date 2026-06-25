@@ -125,6 +125,14 @@ export function useAudio(): void {
   useEffect(() => {
     const m = new Audio()
     const a = new Audio()
+    // Folder songs are served from http://asset.localhost — a DIFFERENT origin than
+    // the app. Routed through a MediaElementSource (audioBus), cross-origin media
+    // without CORS is silenced by WebKit (it "plays" but outputs nothing). Request
+    // it CORS-clean so the Web Audio graph actually produces sound; Tauri's asset
+    // protocol replies with Access-Control-Allow-Origin, and same-origin bundled
+    // tracks are unaffected.
+    m.crossOrigin = 'anonymous'
+    a.crossOrigin = 'anonymous'
     a.loop = true
     musicRef.current = m
     ambientRef.current = a
