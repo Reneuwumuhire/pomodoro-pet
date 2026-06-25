@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { getLevels } from '@/audio/audioBus'
-import { forwardTrack, nextTrack, nowPlaying } from '@/audio/musicControls'
-import { IconVolume, IconMuted, IconForward, IconSkip, IconMusic } from '@/icons'
+import { nextTrack, nowPlaying } from '@/audio/musicControls'
+import { IconVolume, IconMuted, IconSkip, IconMusic } from '@/icons'
 
 interface Props {
   muted: boolean
@@ -80,9 +80,6 @@ export default function SpeakerBar({ muted, onToggleMute }: Props): JSX.Element 
         <div className="grille">
           <canvas ref={canvasRef} className="grille-canvas" />
         </div>
-        <button className="chip" onClick={() => forwardTrack(30)} title="Fast-forward 30s">
-          <IconForward size={15} />
-        </button>
         <button className="chip" onClick={() => nextTrack()} title="Next song">
           <IconSkip size={15} />
         </button>

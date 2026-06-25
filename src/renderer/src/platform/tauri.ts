@@ -68,6 +68,16 @@ export const tauriApi: PomodoroApi = {
   // drag-drop: convert an absolute path to an asset: URL the <audio> element can load
   getPathForFile: (file: File) => convertFileSrc((file as unknown as { path: string }).path),
 
+  // native folder-music player (rodio) — fire-and-forget commands + a state query.
+  musicPlay: (index: number, volume: number) => void invoke('music_play', { index, volume }),
+  musicPause: () => void invoke('music_pause'),
+  musicResume: (volume: number) => void invoke('music_resume', { volume }),
+  musicSetVolume: (volume: number) => void invoke('music_set_volume', { volume }),
+  musicNext: () => void invoke('music_next'),
+  musicPrev: () => void invoke('music_prev'),
+  musicStop: () => void invoke('music_stop'),
+  musicNow: () => invoke('music_now'),
+
   // focus shield
   snoozeBlocker: () => void invoke('blocker_snooze'),
   testBlocker: () => invoke('blocker_test'),

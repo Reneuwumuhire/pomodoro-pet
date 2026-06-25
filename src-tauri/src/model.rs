@@ -20,7 +20,10 @@ pub enum Status {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+// `default` so a newer build that adds a field still loads an older saved file —
+// missing fields fall back to Default instead of failing the parse (which would
+// reset ALL settings). Keeps user data across updates.
+#[serde(rename_all = "camelCase", default)]
 pub struct Settings {
     pub focus_min: u32,
     pub short_min: u32,
@@ -57,8 +60,8 @@ impl Default for Settings {
     }
 }
 
-#[derive(Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Clone, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", default)]
 pub struct Task {
     pub id: String,
     pub title: String,
@@ -71,7 +74,7 @@ pub struct Task {
 }
 
 #[derive(Clone, Default, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", default)]
 pub struct Stats {
     pub history: std::collections::HashMap<String, u32>,
     pub minutes: std::collections::HashMap<String, u32>,

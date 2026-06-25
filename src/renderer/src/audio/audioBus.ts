@@ -67,8 +67,13 @@ export function connectElement(el: HTMLAudioElement): void {
 /** Set an element's output level (0..1) via its gain node — the only reliable
  *  volume/mute control once routed through WebAudio (works in WebKit + Chromium). */
 export function setElementVolume(el: HTMLAudioElement, v: number): void {
+  const vol = Math.max(0, Math.min(1, v))
   const g = gains.get(el)
-  if (g) g.gain.value = Math.max(0, Math.min(1, v))
+  // Routed through WebAudio → control via the gain node (WebKit ignores el.volume
+  // then). Not routed (e.g. the music element, kept off the graph so cross-origin
+  // folder songs aren't silenced) → the element's own volume works normally.
+  if (g) g.gain.value = vol
+  else el.volume = vol
 }
 
 export function resume(): void {

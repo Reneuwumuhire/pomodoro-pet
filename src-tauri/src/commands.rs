@@ -206,6 +206,60 @@ pub fn app_meta(app: AppHandle) -> Value {
     })
 }
 
+// ── Native folder-music player (rodio) ───────────────────────────────────────
+use crate::audio_player::{Cmd, Now, Player};
+
+/// Absolute paths of the audio files in the music folder, sorted (the playlist).
+fn folder_tracks(app: &AppHandle) -> Vec<String> {
+    let dir = music_dir(app);
+    if dir.is_empty() {
+        return vec![];
+    }
+    let mut tracks: Vec<String> = std::fs::read_dir(&dir)
+        .map(|rd| {
+            rd.filter_map(|e| e.ok())
+                .filter_map(|e| {
+                    let p = e.path();
+                    let ext = p.extension().and_then(|x| x.to_str()).unwrap_or("").to_lowercase();
+                    if AUDIO_EXT.contains(&ext.as_str()) {
+                        Some(p.to_string_lossy().to_string())
+                    } else {
+                        None
+                    }
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+    tracks.sort();
+    tracks
+}
+
+#[tauri::command]
+pub fn music_play(index: Option<usize>, volume: f32, app: AppHandle) {
+    let tracks = folder_tracks(&app);
+    let player = app.state::<Player>();
+    player.send(Cmd::SetVolume(volume));
+    player.send(Cmd::Play { tracks, index: index.unwrap_or(0) });
+}
+#[tauri::command]
+pub fn music_pause(app: AppHandle) { app.state::<Player>().send(Cmd::Pause); }
+#[tauri::command]
+pub fn music_resume(volume: f32, app: AppHandle) {
+    let player = app.state::<Player>();
+    player.send(Cmd::SetVolume(volume));
+    player.send(Cmd::Resume);
+}
+#[tauri::command]
+pub fn music_set_volume(volume: f32, app: AppHandle) { app.state::<Player>().send(Cmd::SetVolume(volume)); }
+#[tauri::command]
+pub fn music_next(app: AppHandle) { app.state::<Player>().send(Cmd::Next); }
+#[tauri::command]
+pub fn music_prev(app: AppHandle) { app.state::<Player>().send(Cmd::Prev); }
+#[tauri::command]
+pub fn music_stop(app: AppHandle) { app.state::<Player>().send(Cmd::Stop); }
+#[tauri::command]
+pub fn music_now(app: AppHandle) -> Now { app.state::<Player>().now.lock().unwrap().clone() }
+
 #[tauri::command]
 pub fn open_external(app: AppHandle, url: String) {
     if url.starts_with("https://") || url.starts_with("http://") {

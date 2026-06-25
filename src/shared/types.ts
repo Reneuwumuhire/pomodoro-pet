@@ -160,6 +160,16 @@ export interface PomodoroApi {
   /** Resolve the absolute path of a dragged File/folder (Electron webUtils). */
   getPathForFile(file: File): string
   openMusicFolder(): void
+  // native folder-music player (rodio in the Tauri build; the WebView can't play
+  // arbitrary local media on macOS). Volumes are 0..1 final levels.
+  musicPlay(index: number, volume: number): void
+  musicPause(): void
+  musicResume(volume: number): void
+  musicSetVolume(volume: number): void
+  musicNext(): void
+  musicPrev(): void
+  musicStop(): void
+  musicNow(): Promise<{ name: string; index: number; count: number; playing: boolean }>
   // distraction blocker overlay
   snoozeBlocker(): void
   onBlockerSite(cb: (site: string) => void): () => void

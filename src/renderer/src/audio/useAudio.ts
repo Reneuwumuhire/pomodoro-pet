@@ -22,133 +22,96 @@ const BUNDLED: Record<string, string> = {
   brown: brownUrl,
   cafe: cafeUrl
 }
-// Ambient drop-in overrides, keyed by slot.
-const AMBIENT_FILE: Record<string, string> = {
-  rain: 'rain.mp3',
-  whitenoise: 'white.mp3',
-  brown: 'ocean.mp3',
-  cafe: 'cafe.mp3'
-}
-// Folder a custom song lives in (from settings.musicFolder). The Tauri build uses it
-// to build an asset: URL; Electron ignores it and uses the pomo-audio:// protocol.
-let currentMusicDir = ''
-const trackUrl = (file: string): string => {
-  const conv = (window as unknown as { __convertFileSrc?: (p: string) => string }).__convertFileSrc
-  if (conv && currentMusicDir) return conv(`${currentMusicDir}/${file}`)
-  return `pomo-audio://local/${encodeURIComponent(file)}`
-}
-
-function ambientUrl(slot: string, slots: Record<string, boolean>): string {
-  if (slots[slot]) return trackUrl(AMBIENT_FILE[slot])
-  return BUNDLED[slot]
-}
 
 /**
- * Drives music + ambient playback from the live timer state. The music folder
- * is treated as a playlist: songs auto-advance, and the speaker bar can skip /
- * fast-forward. Falls back to the bundled loop when the folder is empty.
+ * Drives music + ambient playback from the live timer state.
+ *
+ * Bundled loops + ambient play through WebView <audio> elements (same-origin assets,
+ * routed via WebAudio so the speaker grille reacts). Custom *folder* songs can't play
+ * in the WebView on macOS (WKWebView only loads media from its own origin), so they're
+ * decoded + played natively by rodio in Rust — we just send play/pause/volume/skip
+ * commands. The folder is treated as a playlist that auto-advances.
  */
 export function useAudio(): void {
   const state = usePomodoro((s) => s.state)
-  const musicRef = useRef<HTMLAudioElement | null>(null)
-  const ambientRef = useRef<HTMLAudioElement | null>(null)
-  const libraryRef = useRef<string[]>([])
-  const idxRef = useRef(0)
-  const [slots, setSlots] = useState<Record<string, boolean>>({})
+  const musicRef = useRef<HTMLAudioElement | null>(null) // bundled music loop
+  const ambientRef = useRef<HTMLAudioElement | null>(null) // ambient loop
+  const [libCount, setLibCount] = useState(0) // # of songs in the folder (0 = bundled mode)
+  // Native player (rodio) bookkeeping.
+  const startedRef = useRef(false) // playlist loaded into the native player
+  const playingRef = useRef(false) // native player currently playing
+  const volRef = useRef(-1) // last volume sent to the native player
+  const nowRef = useRef<{ name: string; hasLibrary: boolean }>({ name: '', hasLibrary: false })
 
-  // play song i from the library (wraps around)
-  const playIndex = useCallback((i: number): void => {
-    const lib = libraryRef.current
-    const m = musicRef.current
-    if (!lib.length || !m) return
-    idxRef.current = ((i % lib.length) + lib.length) % lib.length
-    const url = trackUrl(lib[idxRef.current])
-    m.loop = false
-    m.src = url
-    m.dataset.url = url
-    m.currentTime = 0
-    resume()
-    void m.play().catch(() => {})
+  // Pull the current track name from the native player so the speaker bar can show it.
+  const refreshNow = useCallback(async (): Promise<void> => {
+    try {
+      const n = await window.pomodoro.musicNow()
+      nowRef.current = { name: n.count ? prettyTrack(n.name) : '', hasLibrary: n.count > 0 }
+    } catch {
+      /* not available (web build) */
+    }
   }, [])
 
-  // expose next / fast-forward / now-playing to the speaker bar
+  // Speaker-bar controls (skip/forward operate the native playlist).
   useEffect(() => {
     setMusicHandlers({
-      next: () => playIndex(idxRef.current + 1),
-      forward: (sec) => {
-        const m = musicRef.current
-        if (!m) return
-        const dur = Number.isFinite(m.duration) ? m.duration : m.currentTime + sec
-        if (m.currentTime + sec >= dur && libraryRef.current.length) playIndex(idxRef.current + 1)
-        else m.currentTime = m.currentTime + sec
+      next: () => {
+        if (libCount) {
+          window.pomodoro.musicNext()
+          void refreshNow()
+        }
       },
-      now: () => ({
-        name: libraryRef.current.length ? prettyTrack(libraryRef.current[idxRef.current]) : '',
-        hasLibrary: libraryRef.current.length > 0
-      })
+      forward: () => {
+        if (libCount) {
+          window.pomodoro.musicNext()
+          void refreshNow()
+        }
+      },
+      now: () => nowRef.current
     })
-  }, [playIndex])
+  }, [libCount, refreshNow])
 
-  // load the library + which ambient slots are overridden; refresh on run-start
-  useEffect(() => {
-    const load = (): void => {
-      window.pomodoro.getAudioSlots().then(setSlots).catch(() => {})
-      window.pomodoro
-        .getMusicLibrary()
-        .then((lib) => {
-          libraryRef.current = lib
-          if (idxRef.current >= lib.length) idxRef.current = 0
-        })
-        .catch(() => {})
-    }
-    load()
-    const off = window.pomodoro.onState((s) => {
-      if (s.status === 'running') load()
-    })
-    return off
-  }, [])
-
-  // reload the playlist immediately when the music folder changes
+  // Reload the playlist when the folder changes; reset the native player.
   const musicFolder = state?.settings.musicFolder
   useEffect(() => {
-    currentMusicDir = musicFolder ?? ''
+    window.pomodoro.musicStop()
+    startedRef.current = false
+    playingRef.current = false
+    volRef.current = -1
     window.pomodoro
       .getMusicLibrary()
-      .then((lib) => {
-        libraryRef.current = lib
-        if (idxRef.current >= lib.length) idxRef.current = 0
-      })
-      .catch(() => {})
-  }, [musicFolder])
+      .then((lib) => setLibCount(lib.length))
+      .catch(() => setLibCount(0))
+    void refreshNow()
+  }, [musicFolder, refreshNow])
 
-  // create the two audio elements once
+  // Keep the speaker-bar label in sync as tracks auto-advance.
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (playingRef.current) void refreshNow()
+    }, 1500)
+    return () => clearInterval(id)
+  }, [refreshNow])
+
+  // Create the two WebView audio elements once (bundled music + ambient).
   useEffect(() => {
     const m = new Audio()
     const a = new Audio()
-    // Folder songs are served from http://asset.localhost — a DIFFERENT origin than
-    // the app. Routed through a MediaElementSource (audioBus), cross-origin media
-    // without CORS is silenced by WebKit (it "plays" but outputs nothing). Request
-    // it CORS-clean so the Web Audio graph actually produces sound; Tauri's asset
-    // protocol replies with Access-Control-Allow-Origin, and same-origin bundled
-    // tracks are unaffected.
-    m.crossOrigin = 'anonymous'
-    a.crossOrigin = 'anonymous'
     a.loop = true
     musicRef.current = m
     ambientRef.current = a
-    m.onended = (): void => {
-      if (libraryRef.current.length) playIndex(idxRef.current + 1)
-    }
     connectElement(m)
     connectElement(a)
     return () => {
       m.pause()
       a.pause()
+      window.pomodoro.musicStop()
       setPlaying(false)
     }
-  }, [playIndex])
+  }, [])
 
-  // react to timer state
+  // React to timer state.
   useEffect(() => {
     const m = musicRef.current
     const a = ambientRef.current
@@ -158,39 +121,57 @@ export function useAudio(): void {
     const isBreak = state.phase === 'short' || state.phase === 'long'
     const master = s.muted ? 0 : s.volume
     const musicEnabled = (isBreak ? s.breakMusic : s.focusMusic) !== 'none'
-    const lib = libraryRef.current
+    const musicVol = s.musicVolume * master
+    const hasFolder = libCount > 0
 
-    // ---- music ----
-    if (musicEnabled && running) {
-      setElementVolume(m, s.musicVolume * master)
-      if (lib.length) {
-        // playlist mode — keep playing the current song, advancing on end
-        m.loop = false
-        const cur = trackUrl(lib[idxRef.current])
-        if (m.dataset.url !== cur) {
-          m.src = cur
-          m.dataset.url = cur
+    if (hasFolder) {
+      // ---- folder playlist via the native (rodio) player ----
+      if (!m.paused) m.pause() // never double up with the bundled element
+      if (musicEnabled && running) {
+        if (!startedRef.current) {
+          window.pomodoro.musicPlay(0, musicVol)
+          startedRef.current = true
+          playingRef.current = true
+          volRef.current = musicVol
+          void refreshNow()
+        } else if (!playingRef.current) {
+          window.pomodoro.musicResume(musicVol)
+          playingRef.current = true
+          volRef.current = musicVol
         }
-        resume()
-        if (m.paused) void m.play().catch(() => {})
-      } else {
-        // single bundled/slot loop
+        if (playingRef.current && volRef.current !== musicVol) {
+          window.pomodoro.musicSetVolume(musicVol)
+          volRef.current = musicVol
+        }
+      } else if (playingRef.current) {
+        window.pomodoro.musicPause()
+        playingRef.current = false
+      }
+    } else {
+      // ---- bundled loop via the WebView element ----
+      if (startedRef.current) {
+        window.pomodoro.musicStop()
+        startedRef.current = false
+        playingRef.current = false
+      }
+      if (musicEnabled && running) {
+        setElementVolume(m, musicVol)
         m.loop = true
         const slot = isBreak ? s.breakMusic : s.focusMusic
         const url = BUNDLED[slot]
-        if (m.dataset.url !== url) {
+        if (url && m.dataset.url !== url) {
           m.src = url
           m.dataset.url = url
         }
         resume()
         if (m.paused) void m.play().catch(() => {})
+      } else if (!m.paused) {
+        m.pause()
       }
-    } else if (!m.paused) {
-      m.pause()
     }
 
     // ---- ambient (continuous loop while running) ----
-    const aUrl = s.ambient === 'none' ? null : ambientUrl(s.ambient, slots)
+    const aUrl = s.ambient === 'none' ? null : BUNDLED[s.ambient]
     if (aUrl && running) {
       if (a.dataset.url !== aUrl) {
         a.src = aUrl
@@ -204,5 +185,5 @@ export function useAudio(): void {
     }
 
     setPlaying(running && (musicEnabled || !!aUrl))
-  }, [state, slots])
+  }, [state, libCount, refreshNow])
 }

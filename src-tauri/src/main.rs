@@ -1,6 +1,7 @@
 // Hide the extra console window on Windows in release.
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod audio_player;
 mod commands;
 mod focus_guard;
 mod model;
@@ -37,6 +38,10 @@ fn main() {
             let mut engine = TimerEngine::new(settings, store::completed_today(h));
             engine.active_task_id = store::load_active_task(h);
             app.manage(AppState { engine: Mutex::new(engine) });
+
+            // Native folder-music player (rodio) — the WebView can't play arbitrary
+            // local media on macOS, so we decode + output audio in Rust.
+            app.manage(audio_player::Player::new());
 
             // menu-bar tray: live countdown title + context menu mirroring the Electron app
             let toggle = MenuItem::with_id(app, "toggle", "Start / Pause", true, None::<&str>)?;
@@ -132,6 +137,14 @@ fn main() {
             commands::blocker_snooze,
             commands::blocker_test,
             commands::app_meta,
+            commands::music_play,
+            commands::music_pause,
+            commands::music_resume,
+            commands::music_set_volume,
+            commands::music_next,
+            commands::music_prev,
+            commands::music_stop,
+            commands::music_now,
             commands::open_external,
         ])
         .build(tauri::generate_context!())
