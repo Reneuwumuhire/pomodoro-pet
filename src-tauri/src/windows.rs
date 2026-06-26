@@ -11,10 +11,23 @@ static POPOVER_PINNED: AtomicBool = AtomicBool::new(false);
 pub fn set_pinned(v: bool) { POPOVER_PINNED.store(v, Ordering::Relaxed); }
 pub fn is_pinned() -> bool { POPOVER_PINNED.load(Ordering::Relaxed) }
 
+/// Mirrors the blocker overlay's visibility. Kept as an atomic so the tick-loop
+/// (background) thread can read it without touching NSWindow off-main.
+static BLOCKER_VISIBLE: AtomicBool = AtomicBool::new(false);
+
 /// Fullscreen strict-mode breathing-break takeover, synced to strict breaks
 /// (matches Electron's syncStrictWindow): shown while strict mode is on and a
 /// break phase is running; hidden otherwise.
 pub fn sync_strict(app: &AppHandle) {
+    // Window ops below (show/hide + AppKit setLevel via raise_above_everything) MUST
+    // run on the main thread. This is called from the tick-loop *background* thread on
+    // phase completion; touching NSWindow off-main crashes AppKit (SIGTRAP) and kills
+    // the app the instant the break overlay appears. Marshal to the main thread.
+    let h = app.clone();
+    let _ = app.run_on_main_thread(move || sync_strict_main(&h));
+}
+
+fn sync_strict_main(app: &AppHandle) {
     let (strict, show) = {
         let st = app.state::<AppState>();
         let e = st.engine.lock().unwrap();
@@ -106,10 +119,8 @@ pub fn overlay_active(app: &AppHandle) -> bool {
 /// True while the site-blocker overlay is on screen. Used by the focus guard to
 /// avoid a flicker loop: when our own overlay grabs focus, Petomato becomes the
 /// frontmost app, which would otherwise read as "navigated away" and hide it.
-pub fn blocker_visible(app: &AppHandle) -> bool {
-    app.get_webview_window("blocker")
-        .and_then(|w| w.is_visible().ok())
-        .unwrap_or(false)
+pub fn blocker_visible(_app: &AppHandle) -> bool {
+    BLOCKER_VISIBLE.load(Ordering::Relaxed)
 }
 
 pub fn show_main(app: &AppHandle) {
@@ -218,6 +229,15 @@ pub fn show_about(app: &AppHandle) {
 
 /// Show / hide the full-screen strict-focus blocker overlay (`blocked.html`).
 pub fn show_blocker(app: &AppHandle, site: &str) {
+    // Marshal to the main thread (see sync_strict): focus_guard::maybe_sync calls
+    // this from the tick-loop background thread, and the AppKit window ops below
+    // (incl. raise_above_everything's setLevel) crash off-main.
+    let h = app.clone();
+    let site = site.to_string();
+    let _ = app.run_on_main_thread(move || show_blocker_main(&h, &site));
+}
+
+fn show_blocker_main(app: &AppHandle, site: &str) {
     use tauri::Emitter;
     let url = format!("blocked.html?site={}", urlencoding(site));
     let win = match app.get_webview_window("blocker") {
@@ -241,6 +261,7 @@ pub fn show_blocker(app: &AppHandle, site: &str) {
         },
     };
     let _ = win.emit("blocker-site", site); // update the site even when already open
+    BLOCKER_VISIBLE.store(true, Ordering::Relaxed);
     if win.is_visible().unwrap_or(false) {
         return;
     }
@@ -256,7 +277,11 @@ pub fn show_blocker(app: &AppHandle, site: &str) {
     raise_above_everything(&win); // above everything + not draggable
 }
 pub fn hide_blocker(app: &AppHandle) {
-    if let Some(w) = app.get_webview_window("blocker") { let _ = w.hide(); }
+    BLOCKER_VISIBLE.store(false, Ordering::Relaxed);
+    let h = app.clone();
+    let _ = app.run_on_main_thread(move || {
+        if let Some(w) = h.get_webview_window("blocker") { let _ = w.hide(); }
+    });
 }
 
 fn urlencoding(s: &str) -> String {
