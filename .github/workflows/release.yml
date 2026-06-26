@@ -14,17 +14,34 @@ jobs:
       contents: write
     strategy:
       fail-fast: false
+      # Serialized: multiple jobs merge into the same latest.json, and concurrent
+      # merges can clobber each other's platform entry. One at a time = correct
+      # manifest (slower wall-clock, but a release runs rarely).
+      max-parallel: 1
       matrix:
         include:
-          # Universal macOS build (Intel + Apple Silicon in one artifact). Until the
-          # APPLE_* secrets are set it builds UNSIGNED — fine for your own machine
-          # (right-click → Open), but Gatekeeper warns other users. See RELEASING.md.
+          # Universal DMG (both chips) for manual download by users who aren't sure
+          # which Mac they have. Excluded from latest.json (updaterJson: false) so it
+          # doesn't overwrite the darwin entries — auto-update uses the smaller
+          # per-arch artifacts below. Unsigned until APPLE_* secrets exist.
           - platform: macos-latest
             args: '--target universal-apple-darwin'
             rust-targets: 'aarch64-apple-darwin,x86_64-apple-darwin'
+            updaterJson: false
+          # Apple Silicon — ~half the size; owns darwin-aarch64 in latest.json.
+          - platform: macos-latest
+            args: '--target aarch64-apple-darwin'
+            rust-targets: 'aarch64-apple-darwin'
+            updaterJson: true
+          # Intel — ~half the size; owns darwin-x86_64 in latest.json.
+          - platform: macos-latest
+            args: '--target x86_64-apple-darwin'
+            rust-targets: 'x86_64-apple-darwin'
+            updaterJson: true
           - platform: windows-latest
             args: ''
             rust-targets: ''
+            updaterJson: true
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
@@ -74,5 +91,6 @@ jobs:
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
-          # tauri-action generates + merges latest.json across the matrix jobs.
-          includeUpdaterJson: true
+          # Per-job: the universal mac build is excluded so auto-update serves the
+          # smaller per-arch artifacts. tauri-action merges latest.json across jobs.
+          includeUpdaterJson: ${{ matrix.updaterJson }}
