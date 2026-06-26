@@ -16,6 +16,9 @@
     "notification:default",
     "dialog:allow-open",
     "opener:allow-open-url",
-    "http:default"
+    "http:default",
+    "updater:default",
+    "process:default",
+    "process:allow-restart"
   ]
 }

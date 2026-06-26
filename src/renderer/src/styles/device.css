@@ -1266,3 +1266,55 @@ input[type='range'] {
 .tauri select:focus,
 .tauri textarea:focus,
 .tauri button:focus { outline: none; }
+
+/* ===================== Auto-update prompt (launch check) ===================== */
+/* Unobtrusive pill pinned to the bottom of the main popover; only mounts when a
+   newer signed release is available (see UpdateBanner.tsx). */
+.update-banner {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px 5px 12px;
+  border-radius: 999px;
+  background: rgba(20, 20, 22, 0.92);
+  color: #fff;
+  font-size: 11px;
+  line-height: 1;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+  z-index: 50;
+  white-space: nowrap;
+}
+.update-label {
+  opacity: 0.92;
+}
+.update-busy {
+  opacity: 0.8;
+  font-variant-numeric: tabular-nums;
+}
+.update-go {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #ff5a5f;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+}
+.update-go:hover {
+  background: #ff6b70;
+}
+.update-x {
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 10px;
+}
+.update-x:hover {
+  color: #fff;
+}

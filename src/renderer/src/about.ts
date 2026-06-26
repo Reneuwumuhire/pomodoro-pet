@@ -2,6 +2,7 @@ import './styles/about.css'
 import iconUrl from './assets/icon.png'
 import { invoke } from '@tauri-apps/api/core'
 import { getCurrentWindow } from '@tauri-apps/api/window'
+import { checkForUpdate, downloadAndRelaunch } from './platform/updater'
 
 interface Meta {
   name: string
@@ -52,34 +53,75 @@ async function render(): Promise<void> {
 
   const status = document.getElementById('status') as HTMLElement
   const check = document.getElementById('check') as HTMLButtonElement
+
+  /** Fallback when the native updater can't run (dev build, offline, or a build
+   *  predating the updater): just point the user at the GitHub download. */
+  async function manualCheck(): Promise<void> {
+    const res = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`, {
+      headers: { Accept: 'application/vnd.github+json' }
+    })
+    if (!res.ok) throw new Error('network')
+    const rel = (await res.json()) as {
+      tag_name?: string
+      html_url?: string
+      assets?: { name: string; browser_download_url: string }[]
+    }
+    const latest = (rel.tag_name || '').replace(/^v/i, '')
+    if (latest && isNewer(latest, m.version)) {
+      const dmg = (rel.assets || []).find((a) => /\.dmg$/i.test(a.name))
+      const url = dmg?.browser_download_url || rel.html_url || `https://github.com/${REPO}/releases`
+      status.className = 'about-status up'
+      status.innerHTML = `Update available — v${latest}. <button class="link" id="dl" type="button">Download</button>`
+      ;(document.getElementById('dl') as HTMLElement).onclick = () => open(url)
+    } else {
+      status.className = 'about-status ok'
+      status.textContent = `You’re on the latest version ✓`
+    }
+  }
+
   check.onclick = async (): Promise<void> => {
     check.disabled = true
     status.className = 'about-status'
     status.textContent = 'Checking…'
     try {
-      const res = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`, {
-        headers: { Accept: 'application/vnd.github+json' }
-      })
-      if (!res.ok) throw new Error('network')
-      const rel = (await res.json()) as {
-        tag_name?: string
-        html_url?: string
-        assets?: { name: string; browser_download_url: string }[]
-      }
-      const latest = (rel.tag_name || '').replace(/^v/i, '')
-      if (latest && isNewer(latest, m.version)) {
-        const dmg = (rel.assets || []).find((a) => /\.dmg$/i.test(a.name))
-        const url = dmg?.browser_download_url || rel.html_url || `https://github.com/${REPO}/releases`
-        status.className = 'about-status up'
-        status.innerHTML = `Update available — v${latest}. <button class="link" id="dl" type="button">Download</button>`
-        ;(document.getElementById('dl') as HTMLElement).onclick = () => open(url)
-      } else {
+      const update = await checkForUpdate()
+      if (!update) {
         status.className = 'about-status ok'
         status.textContent = `You’re on the latest version ✓`
+        return
+      }
+      // Update found — confirm before downloading + restarting the app.
+      status.className = 'about-status up'
+      status.innerHTML = `Update available — v${update.version}. <button class="link" id="go" type="button">Update &amp; Restart</button>`
+      const go = document.getElementById('go') as HTMLButtonElement
+      go.onclick = async (): Promise<void> => {
+        go.disabled = true
+        try {
+          await downloadAndRelaunch(update, (p) => {
+            if (p.phase === 'downloading') {
+              const pct = p.percent != null ? ` ${Math.round(p.percent * 100)}%` : '…'
+              status.textContent = `Downloading v${update.version}${pct}`
+            } else if (p.phase === 'installing') {
+              status.textContent = 'Installing… the app will restart.'
+            }
+          })
+        } catch {
+          status.className = 'about-status'
+          status.innerHTML = `Update failed. <button class="link" id="op" type="button">Open Releases</button>`
+          ;(document.getElementById('op') as HTMLElement).onclick = () =>
+            open(`https://github.com/${REPO}/releases`)
+        }
       }
     } catch {
-      status.innerHTML = `Couldn’t reach GitHub. <button class="link" id="op" type="button">Open Releases</button>`
-      ;(document.getElementById('op') as HTMLElement).onclick = () => open(`https://github.com/${REPO}/releases`)
+      // Native updater unavailable — degrade to the manual GitHub flow.
+      try {
+        await manualCheck()
+      } catch {
+        status.className = 'about-status'
+        status.innerHTML = `Couldn’t reach GitHub. <button class="link" id="op2" type="button">Open Releases</button>`
+        ;(document.getElementById('op2') as HTMLElement).onclick = () =>
+          open(`https://github.com/${REPO}/releases`)
+      }
     } finally {
       check.disabled = false
     }

@@ -39,6 +39,7 @@
   },
   "bundle": {
     "active": true,
+    "createUpdaterArtifacts": true,
     "targets": ["dmg", "app", "nsis", "msi"],
     "category": "Productivity",
     "copyright": "© Rene Uwumuhire",
@@ -68,5 +69,12 @@
       "allowDowngrades": true
     }
   },
-  "plugins": {}
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEE2MUYyNkExNTEzRkYxQzQKUldURThUOVJvU1lmcHB6UDF2QXlrQkF1bVc0dlZxaXo4dEk4UVFISzh4R1NPRFhUVTV5c0J0amEK",
+      "endpoints": [
+        "https://github.com/Reneuwumuhire/petomato/releases/latest/download/latest.json"
+      ]
+    }
+  }
 }

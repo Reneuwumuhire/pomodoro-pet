@@ -5,6 +5,7 @@ import Device from '@/components/Device'
 import MiniDevice from '@/components/MiniDevice'
 import StrictBreak from '@/components/StrictBreak'
 import Blocker from '@/components/Blocker'
+import UpdateBanner from '@/components/UpdateBanner'
 
 interface Props {
   mode: 'full' | 'mini' | 'strict' | 'blocked'
@@ -27,5 +28,10 @@ export default function App({ mode }: Props): JSX.Element {
 function FullApp(): JSX.Element {
   // The main window owns chime + music playback (it's only hidden, never closed).
   useChime()
-  return <Device />
+  return (
+    <>
+      <Device />
+      <UpdateBanner />
+    </>
+  )
 }
