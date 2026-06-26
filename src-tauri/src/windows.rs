@@ -27,15 +27,23 @@ pub fn sync_strict(app: &AppHandle) {
 }
 
 fn show_strict(app: &AppHandle) {
-    let win = app.get_webview_window("strict").unwrap_or_else(|| {
-        WebviewWindowBuilder::new(app, "strict", WebviewUrl::App("strict.html".into()))
+    let win = match app.get_webview_window("strict") {
+        Some(w) => w,
+        None => match WebviewWindowBuilder::new(app, "strict", WebviewUrl::App("strict.html".into()))
             .decorations(false)
             .always_on_top(true)
             .skip_taskbar(true)
             .visible(false)
             .build()
-            .expect("build strict")
-    });
+        {
+            Ok(w) => w,
+            // See show_blocker: never panic on the timer-loop path (panic = "abort").
+            Err(e) => {
+                eprintln!("[petomato] failed to build strict window: {e}");
+                return;
+            }
+        },
+    };
     // sync_strict runs on every tick — only (re)show + focus on the transition to
     // visible, otherwise it would steal focus continuously.
     if win.is_visible().unwrap_or(false) {
@@ -95,6 +103,15 @@ pub fn overlay_active(app: &AppHandle) -> bool {
     })
 }
 
+/// True while the site-blocker overlay is on screen. Used by the focus guard to
+/// avoid a flicker loop: when our own overlay grabs focus, Petomato becomes the
+/// frontmost app, which would otherwise read as "navigated away" and hide it.
+pub fn blocker_visible(app: &AppHandle) -> bool {
+    app.get_webview_window("blocker")
+        .and_then(|w| w.is_visible().ok())
+        .unwrap_or(false)
+}
+
 pub fn show_main(app: &AppHandle) {
     if let Some(w) = app.get_webview_window("main") {
         let _ = w.show();
@@ -112,8 +129,9 @@ pub fn toggle_main(app: &AppHandle) {
 
 pub fn show_mini(app: &AppHandle) {
     if let Some(m) = app.get_webview_window("main") { let _ = m.hide(); }
-    let win = app.get_webview_window("mini").unwrap_or_else(|| {
-        WebviewWindowBuilder::new(app, "mini", WebviewUrl::App("mini.html".into()))
+    let win = match app.get_webview_window("mini") {
+        Some(w) => w,
+        None => match WebviewWindowBuilder::new(app, "mini", WebviewUrl::App("mini.html".into()))
             .title("Petomato — Mini")
             // Card fills the window with rounded corners; the native macOS window
             // shadow then follows the rounded shape (shadow(false) doesn't reliably
@@ -126,8 +144,14 @@ pub fn show_mini(app: &AppHandle) {
             .always_on_top(true)
             .skip_taskbar(true)
             .build()
-            .expect("build mini")
-    });
+        {
+            Ok(w) => w,
+            Err(e) => {
+                eprintln!("[petomato] failed to build mini window: {e}");
+                return;
+            }
+        },
+    };
     let _ = win.set_visible_on_all_workspaces(true);
     // Show first so the window is realized, THEN pin it top-right (setting position
     // before show doesn't stick on macOS). The user can drag it afterwards; the next
@@ -171,7 +195,7 @@ pub fn show_about(app: &AppHandle) {
         let _ = w.set_focus();
         return;
     }
-    let win = WebviewWindowBuilder::new(app, "about", WebviewUrl::App("about.html".into()))
+    let win = match WebviewWindowBuilder::new(app, "about", WebviewUrl::App("about.html".into()))
         .title("About Petomato")
         .inner_size(380.0, 500.0)
         .resizable(false)
@@ -181,7 +205,13 @@ pub fn show_about(app: &AppHandle) {
         .transparent(true)
         .center()
         .build()
-        .expect("build about");
+    {
+        Ok(w) => w,
+        Err(e) => {
+            eprintln!("[petomato] failed to build about window: {e}");
+            return;
+        }
+    };
     let _ = win.show();
     let _ = win.set_focus();
 }
@@ -190,15 +220,26 @@ pub fn show_about(app: &AppHandle) {
 pub fn show_blocker(app: &AppHandle, site: &str) {
     use tauri::Emitter;
     let url = format!("blocked.html?site={}", urlencoding(site));
-    let win = app.get_webview_window("blocker").unwrap_or_else(|| {
-        WebviewWindowBuilder::new(app, "blocker", WebviewUrl::App(url.into()))
+    let win = match app.get_webview_window("blocker") {
+        Some(w) => w,
+        None => match WebviewWindowBuilder::new(app, "blocker", WebviewUrl::App(url.into()))
             .decorations(false)
             .always_on_top(true)
             .skip_taskbar(true)
             .visible(false)
             .build()
-            .expect("build blocker")
-    });
+        {
+            Ok(w) => w,
+            // NEVER panic here: this runs every tick from the timer loop, and the
+            // release profile is `panic = "abort"`, so a panic would kill the whole
+            // app and lose the user's in-progress session. If the overlay can't be
+            // built, just skip showing it this tick — the timer keeps running.
+            Err(e) => {
+                eprintln!("[petomato] failed to build blocker window: {e}");
+                return;
+            }
+        },
+    };
     let _ = win.emit("blocker-site", site); // update the site even when already open
     if win.is_visible().unwrap_or(false) {
         return;

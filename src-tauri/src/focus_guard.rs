@@ -12,7 +12,10 @@ static SNOOZE_UNTIL: AtomicU64 = AtomicU64::new(0);
 
 fn now_ms() -> u64 {
     use std::time::{SystemTime, UNIX_EPOCH};
-    SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as u64
+    // Never unwrap: this is on the per-tick path and the release profile aborts on
+    // panic, which would kill the timer session. A clock before the epoch just maps
+    // to 0 (snooze still works correctly relative to a sane clock).
+    SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_millis() as u64).unwrap_or(0)
 }
 
 pub fn snooze(seconds: u64) {
@@ -42,6 +45,13 @@ pub fn maybe_sync(app: &AppHandle) {
             return;
         }
         let det = detect_front();
+        // When our own overlay grabbed focus, Petomato is the frontmost app. Don't
+        // treat that as "user navigated away" and hide the overlay — that would start
+        // a show/hide/focus-steal flicker loop against the still-blocked browser tab.
+        // Hold the overlay until a real, non-blocked foreground app appears.
+        if det.app.to_lowercase().contains("petomato") && crate::windows::blocker_visible(app) {
+            return;
+        }
         // foreground app/url; redirect background blocked tabs silently, overlay only on
         // the foreground tab (see focusGuard.ts poll()).
         if let Some(hit) = enforce_and_match(&det, &block_list) {
