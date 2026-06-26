@@ -18,6 +18,37 @@ relaunches — no manual download. This doc covers cutting a release.
 > auto-update — users install the first updater-enabled build manually. From
 > that build onward, updates are automatic.
 
+## ⚠️ macOS is currently UNSIGNED — read this
+
+The CI workflow does **not** Apple-code-sign the mac build (the `APPLE_*` env
+block in `release.yml` is commented out — there's no Developer ID cert yet). The
+updater `.app.tar.gz` is still signed with the Tauri **updater** key, so
+auto-update is cryptographically verified, but macOS **Gatekeeper** is a separate
+gate that only a real Apple signature satisfies. Consequences:
+
+- **Fresh install:** double-clicking the app shows *"'Petomato' is damaged and
+  can't be opened. You should eject the disk image."* — it is **not** damaged;
+  Gatekeeper refuses to launch an unsigned, quarantined app. Fix (one time, after
+  dragging the app into `/Applications`):
+
+  ```bash
+  xattr -dr com.apple.quarantine /Applications/Petomato.app
+  ```
+
+  Then open it normally. (For an unsigned/ad-hoc app, right-click → *Open* often
+  does **not** work — the quarantine strip above is the reliable path.)
+
+- **Auto-update relaunch:** when an installed copy updates itself in place, the
+  replaced bundle is still unsigned, so macOS **may re-quarantine it** and show
+  the same "damaged" prompt on the post-update relaunch. The user then re-runs the
+  `xattr` command. In other words, **unsigned mac auto-update is not seamless** —
+  it can require a manual step after each update.
+
+**The cure** is a proper Apple signature + notarization (see *Signing keys* and
+the secrets table below). Once configured, the "damaged"/quarantine prompts
+disappear for you and every user, and in-place mac auto-update becomes seamless.
+Windows is unaffected by all of this.
+
 ## Signing keys
 
 Two independent signatures are involved:
@@ -36,8 +67,12 @@ Two independent signatures are involved:
 
 This bumps the version in `package.json`, `Cargo.toml`, and `tauri.conf.json`,
 commits, tags `v2.1.0`, and pushes. The `release` GitHub Actions workflow
-(`.github/workflows/release.yml`) then builds macOS (universal) + Windows, signs
-everything, generates `latest.json`, and publishes the GitHub Release.
+(`.github/workflows/release.yml`) then builds macOS (per-chip `aarch64` + `x86_64`,
+plus a `universal` DMG for manual download) and Windows, signs the **updater**
+artifacts, generates `latest.json`, and publishes the GitHub Release. Apple
+code-signing runs only once the `APPLE_*` secrets are set (see the unsigned-macOS
+note above). Auto-update serves the per-chip artifacts (~half the size of
+universal).
 
 ### Required GitHub repo secrets
 
