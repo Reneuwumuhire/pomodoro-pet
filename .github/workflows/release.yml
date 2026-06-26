@@ -16,12 +16,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # macOS is disabled until the Apple signing secrets are configured (see
-          # RELEASING.md) — an unsigned mac build trips Gatekeeper. Re-enable by
-          # uncommenting this entry once APPLE_* secrets are set.
-          # - platform: macos-latest
-          #   args: '--target universal-apple-darwin'
-          #   rust-targets: 'aarch64-apple-darwin,x86_64-apple-darwin'
+          # Universal macOS build (Intel + Apple Silicon in one artifact). Until the
+          # APPLE_* secrets are set it builds UNSIGNED — fine for your own machine
+          # (right-click → Open), but Gatekeeper warns other users. See RELEASING.md.
+          - platform: macos-latest
+            args: '--target universal-apple-darwin'
+            rust-targets: 'aarch64-apple-darwin,x86_64-apple-darwin'
           - platform: windows-latest
             args: ''
             rust-targets: ''
